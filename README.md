@@ -17,7 +17,7 @@ Payment gateway untuk menerima pembayaran crypto menggunakan USDT di jaringan Bi
 Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 
 - **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
-- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+- **[EMAIL.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
 - **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
 
 ## Struktur Project
