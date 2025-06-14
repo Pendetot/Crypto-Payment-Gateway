@@ -24,24 +24,30 @@ Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 
 ```
 crypto-payment-gateway/
-├── src/
-│   ├── routes/
-│   │   ├── payment.js      # Payment endpoints
-│   │   ├── webhook.js      # Webhook handlers
-│   │   └── apiKeys.js      # API key management
-│   ├── services/
-│   │   └── paymentService.js  # Core payment logic
-│   ├── validators/
-│   │   └── paymentValidator.js  # Input validation
-│   ├── middleware/
-│   │   ├── auth.js         # Authentication & authorization
-│   │   └── errorHandler.js # Error handling
-│   └── app.js              # Main application
-├── .env.example            # Environment template
-├── package.json
+├── app.js                  # Main application entry point
+├── package.json            # Dependencies dan scripts
+├── package-lock.json       # Lock file untuk dependencies
+├── LICENSE                 # License file
 ├── README.md               # Dokumentasi utama
 ├── SANDBOX.md              # Dokumentasi mode sandbox
 ├── EMAIL_DOCUMENTATION.md  # Dokumentasi sistem email
+├── src/                    # Source code utama
+│   ├── middleware/         # Middleware functions
+│   │   ├── auth.js         # Authentication & authorization
+│   │   └── errorHandler.js # Error handling middleware
+│   ├── routes/             # API route handlers
+│   │   ├── apiKeys.js      # API key management endpoints
+│   │   ├── email.js        # Email notification endpoints
+│   │   ├── payment.js      # Payment endpoints
+│   │   ├── sandbox.js      # Sandbox mode endpoints
+│   │   └── webhook.js      # Webhook handlers
+│   ├── services/           # Business logic services
+│   │   ├── emailService.js         # Email notification service
+│   │   ├── paymentService.js       # Core payment logic
+│   │   ├── paymentServiceFactory.js # Payment service factory
+│   │   └── sandboxPaymentService.js # Sandbox payment service
+│   └── validators/         # Input validation
+│       └── paymentValidator.js     # Payment input validation
 └── example/                # Contoh kode PHP untuk integrasi
     ├── README.md           # Panduan penggunaan contoh
     ├── config.php          # Konfigurasi dan helper functions
