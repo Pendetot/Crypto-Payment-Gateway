@@ -16,7 +16,7 @@ Payment gateway untuk menerima pembayaran crypto menggunakan USDT di jaringan Bi
 
 Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 
-- **[CHANGELOG.md](./CHANGELOG.md)** - Riwayat perubahan dan update terbaru
+- **[CHANGELOG.md](./CHANGELOG.md)** - Catatan perubahan dan update terbaru
 - **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
 - **[EMAIL.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
 - **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
@@ -30,7 +30,7 @@ crypto-payment-gateway/
 ├── package-lock.json       # Lock file untuk dependencies
 ├── LICENSE                 # License file
 ├── README.md               # Dokumentasi utama
-├── CHANGELOG.md            # Riwayat perubahan dan update
+├── CHANGELOG.md            # Catatan perubahan dan update
 ├── SANDBOX.md              # Dokumentasi mode sandbox
 ├── EMAIL_DOCUMENTATION.md  # Dokumentasi sistem email
 ├── src/                    # Source code utama
@@ -206,14 +206,14 @@ USDT_CONTRACT_ADDRESS=0x55d398326f99059fF775485246999027B3197955
 
 # Wallet Configuration
 WALLET_ADDRESS=0x1234567890123456789012345678901234567890
-WALLET_PRIVATE_KEY=abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
+WALLET_PRIVATE_KEY=your_private_key_here_without_0x_prefix
 
-# Security
-API_KEY=def456789012345678901234567890123456789012345678901234567890abc
-WEBHOOK_SECRET=fed654321098765432109876543210987654321098765432109876543210
-JWT_SECRET=abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890abcdef
+# Security Configuration
+API_KEY=your_generated_api_key_here
+WEBHOOK_SECRET=your_generated_webhook_secret_here
+JWT_SECRET=your_generated_jwt_secret_here
 
-# Payment Settings
+# Payment Configuration
 PAYMENT_TIMEOUT=1800
 MIN_CONFIRMATIONS=12
 
@@ -221,644 +221,265 @@ MIN_CONFIRMATIONS=12
 RATE_LIMIT_WINDOW=900000
 RATE_LIMIT_MAX_REQUESTS=100
 
-# CORS (optional)
-ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
-
-# Database (optional)
+# Database (Optional)
 MONGODB_URI=mongodb://localhost:27017/crypto_payment
 REDIS_URL=redis://localhost:6379
+
+# CORS Configuration
+ALLOWED_ORIGINS=*
+
+# Email Configuration (Optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+EMAIL_FROM=noreply@yourcompany.com
 ```
 
-## API Endpoints
+## API Documentation
 
 ### Authentication
 
-Semua endpoint (kecuali `/health` dan `/api/docs`) memerlukan API key authentication:
-
-**Headers:**
+Semua endpoint memerlukan API key di header:
 ```
-X-API-Key: your_api_key
-# atau
-Authorization: Bearer your_api_key
+X-API-Key: your-api-key-here
 ```
 
-### 1. Create Payment
+### Endpoints
 
-**POST** `/api/payment/create`
-
-Headers:
-```
-X-API-Key: your_api_key
+#### 1. Create Payment
+```http
+POST /api/payment/create
 Content-Type: application/json
-```
+X-API-Key: your-api-key
 
-Body:
-```json
 {
   "amount": 100.50,
-  "orderId": "ORDER123",
+  "orderId": "ORDER-123",
   "metadata": {
-    "customerId": "CUST001",
-    "productName": "Premium Package"
+    "customer_email": "customer@example.com",
+    "product_name": "Premium Package"
   }
 }
 ```
 
-Response:
+**Response:**
 ```json
 {
   "success": true,
   "data": {
-    "paymentId": "uuid-here",
-    "originalAmount": "100.50",
-    "amount": "100.73",
-    "walletAddress": "0x...",
-    "trustWalletUrl": "trust://send?...",
-    "qrCode": "data:image/png;base64,...",
-    "expiresAt": "2025-06-08T12:00:00.000Z",
-    "network": "BSC",
-    "token": "USDT",
-    "note": "Please pay exactly 100.73 USDT (100.50 + unique identifier)",
-    "instructions": [
-      "1. Send exactly 100.73 USDT to the provided wallet address",
-      "2. Use BSC (Binance Smart Chain) network",
-      "3. Payment expires at 2025-06-08T12:00:00.000Z",
-      "4. You can scan the QR code with Trust Wallet for easy payment"
-    ]
+    "paymentId": "pay_1234567890",
+    "amount": 100.50,
+    "amountUSDT": "100.500000",
+    "walletAddress": "0x1234...5678",
+    "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+    "trustWalletUrl": "https://link.trustwallet.com/send?coin=20000714&address=0x1234...5678&amount=100500000000000000000",
+    "expiresAt": "2024-12-19T10:30:00.000Z",
+    "status": "pending"
   }
 }
 ```
 
-### 2. Verify Payment
-
-**POST** `/api/payment/verify`
-
-Headers:
-```
-X-API-Key: your_api_key
-Content-Type: application/json
+#### 2. Check Payment Status
+```http
+GET /api/payment/status/:paymentId
+X-API-Key: your-api-key
 ```
 
-Body:
-```json
-{
-  "paymentId": "uuid-here",
-  "txHash": "0x..."
-}
-```
-
-Response:
+**Response:**
 ```json
 {
   "success": true,
   "data": {
-    "paymentId": "uuid-here",
-    "originalAmount": "100.50",
-    "paidAmount": "100.73",
-    "status": "confirmed",
-    "txHash": "0x...",
+    "paymentId": "pay_1234567890",
+    "status": "completed",
+    "amount": 100.50,
+    "amountUSDT": "100.500000",
+    "transactionHash": "0xabcd...1234",
     "confirmations": 15,
-    "verifiedAt": "2025-06-08T12:00:00.000Z",
-    "message": "Payment confirmed successfully"
+    "createdAt": "2024-12-19T10:00:00.000Z",
+    "completedAt": "2024-12-19T10:15:00.000Z"
   }
 }
 ```
 
-### 3. Check Payment Status
+#### 3. Webhook Configuration
+```http
+POST /api/webhook/configure
+Content-Type: application/json
+X-API-Key: your-api-key
 
-**GET** `/api/payment/status/:paymentId`
-
-Headers:
-```
-X-API-Key: your_api_key
-```
-
-Response:
-```json
 {
-  "success": true,
-  "data": {
-    "paymentId": "uuid-here",
-    "status": "pending",
-    "originalAmount": "100.50",
-    "amount": "100.73",
-    "orderId": "ORDER123",
-    "createdAt": "2025-06-08T11:30:00.000Z",
-    "expiresAt": "2025-06-08T12:00:00.000Z",
-    "txHash": null,
-    "confirmations": 0,
-    "network": "BSC",
-    "token": "USDT"
-  }
+  "url": "https://yoursite.com/webhook",
+  "events": ["payment.completed", "payment.expired", "payment.failed"]
 }
 ```
 
-### 4. Check Wallet Balance
+### Webhook Events
 
-**GET** `/api/payment/balance`
+Webhook akan mengirim POST request ke URL yang dikonfigurasi:
 
-Headers:
-```
-X-API-Key: your_api_key
-```
-
-Response:
 ```json
 {
-  "success": true,
+  "event": "payment.completed",
   "data": {
-    "walletAddress": "0x...",
-    "balances": {
-      "BNB": {
-        "amount": "1.234",
-        "symbol": "BNB",
-        "name": "Binance Coin"
-      },
-      "USDT": {
-        "amount": "5000.123456",
-        "symbol": "USDT",
-        "name": "Tether USD",
-        "contractAddress": "0x55d398326f99059fF775485246999027B3197955"
-      }
-    },
-    "network": "BSC (Binance Smart Chain)",
-    "lastUpdated": "2025-06-08T12:00:00.000Z"
-  }
-}
-```
-
-### 5. List Payments (Admin Only)
-
-**GET** `/api/payment/list`
-
-Headers:
-```
-X-API-Key: admin_api_key
-```
-
-Query Parameters:
-- `status`: Filter by status (`pending`, `confirmed`, `expired`)
-- `limit`: Number of results (default: 50)
-- `offset`: Pagination offset (default: 0)
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "payments": [...],
-    "pagination": {
-      "total": 150,
-      "limit": 50,
-      "offset": 0,
-      "hasMore": true
+    "paymentId": "pay_1234567890",
+    "orderId": "ORDER-123",
+    "amount": 100.50,
+    "amountUSDT": "100.500000",
+    "transactionHash": "0xabcd...1234",
+    "status": "completed",
+    "metadata": {
+      "customer_email": "customer@example.com"
     }
-  }
+  },
+  "timestamp": "2024-12-19T10:15:00.000Z",
+  "signature": "sha256=abcd1234..."
 }
 ```
 
-## API Key Management
+## Security
 
-### 1. Create API Key (Admin Only)
-
-**POST** `/api/keys/create`
-
-Headers:
-```
-X-API-Key: admin_api_key
-Content-Type: application/json
-```
-
-Body:
-```json
-{
-  "name": "Mobile App Key",
-  "permissions": ["payment:create", "payment:verify", "payment:status"]
-}
-```
-
-Available permissions:
-- `payment:create` - Create new payments
-- `payment:verify` - Verify payments
-- `payment:status` - Check payment status
-- `payment:balance` - View wallet balance
-- `admin` - Full access to all endpoints
-
-### 2. List API Keys (Admin Only)
-
-**GET** `/api/keys/list`
-
-### 3. Revoke API Key (Admin Only)
-
-**POST** `/api/keys/revoke`
-
-Body:
-```json
-{
-  "apiKey": "api_key_to_revoke"
-}
-```
-
-### 4. Get Current API Key Info
-
-**GET** `/api/keys/info`
-
-## Payment Flow
-
-1. **Create Payment**: Client membuat payment request dengan amount unik
-2. **Generate QR**: System generate QR code untuk Trust Wallet
-3. **User Payment**: User scan QR atau buka Trust Wallet URL
-4. **Transaction**: User mengirim USDT dengan amount unik ke wallet address
-5. **Auto-Detection**: System otomatis detect transaksi masuk via webhook
-6. **Verification**: System verifikasi transaksi di blockchain
-7. **Confirmation**: Payment dikonfirmasi setelah minimum confirmations
-8. **Webhook**: Notifikasi dikirim ke webhook endpoint (opsional)
-
-## Unique Amount System
-
-Untuk menghindari konflik pembayaran, system menggunakan **unique amount**:
-- Original amount: `$100.00`
-- Unique amount: `$100.73` (ditambah random cents)
-- User harus bayar exact amount: `100.73 USDT`
-
-## Payment Status
-
-- `pending`: Pembayaran baru dibuat, menunggu transaksi
-- `pending_confirmation`: Transaksi ditemukan, menunggu konfirmasi
-- `confirmed`: Pembayaran terkonfirmasi dengan cukup konfirmasi
-- `expired`: Pembayaran expired (timeout)
-
-## Webhook Integration
-
-Webhook akan mengirim notifikasi ke endpoint yang Anda tentukan ketika status pembayaran berubah.
-
-### Webhook Endpoints
-
-#### 1. Payment Confirmed
-**POST** `/api/webhook/payment-confirmed`
-
-Headers:
-```
-X-Webhook-Signature: sha256_signature
-Content-Type: application/json
-```
-
-Body:
-```json
-{
-  "paymentId": "uuid-here",
-  "txHash": "0x...",
-  "confirmations": 12
-}
-```
-
-#### 2. Transaction Notification
-**POST** `/api/webhook/transaction-notification`
-
-Body:
-```json
-{
-  "txHash": "0x...",
-  "toAddress": "0x...",
-  "amount": 100.73,
-  "token": "0x..."
-}
-```
+### API Key Management
+- API key di-generate otomatis saat startup jika belum ada
+- Gunakan environment variable untuk menyimpan API key
+- Rotate API key secara berkala
 
 ### Webhook Security
+- Semua webhook request di-sign dengan HMAC-SHA256
+- Verifikasi signature sebelum memproses webhook
+- Gunakan HTTPS untuk webhook URL
 
-Semua webhook request menggunakan signature verification dengan HMAC SHA256. Verifikasi signature di endpoint Anda:
-
-```javascript
-const crypto = require('crypto');
-
-function verifySignature(body, signature, secret) {
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(JSON.stringify(body))
-    .digest('hex');
-  
-  return signature === expectedSignature;
-}
-```
-
-## Trust Wallet Integration
-
-### QR Code Format
-QR code berisi Trust Wallet deep link dengan format:
-```
-trust://send?address=0x...&amount=100.73&token=0x...&memo=paymentId
-```
-
-### Manual Transfer
-User juga bisa transfer manual dengan informasi:
-- **Network**: Binance Smart Chain (BSC)
-- **Token**: USDT (BSC-20)
-- **Address**: Wallet address dari response
-- **Amount**: Jumlah exact dari response (termasuk unique cents)
-- **Memo**: Payment ID (opsional)
-
-## Security Best Practices
-
-1. **API Key**: Gunakan API key yang strong dan unique
-2. **HTTPS**: Selalu gunakan HTTPS di production  
-3. **Rate Limiting**: Sudah diimplementasi (100 req/15 menit per IP)
-4. **API Key Rate Limiting**: Rate limiting per API key
-5. **Input Validation**: Semua input divalidasi dengan Joi
-6. **Private Key**: Jangan expose private key di logs
-7. **Webhook Secret**: Gunakan secret yang strong untuk webhook
-8. **Permission System**: API keys dengan permission-based access
-9. **CORS**: Configure allowed origins untuk security
-10. **Helmet**: Security headers dengan Helmet.js
-
-## Error Handling
-
-### Error Response Format
-```json
-{
-  "success": false,
-  "error": "Error message here"
-}
-```
-
-### Common Error Codes
-- `400`: Bad Request (validation error)
-- `401`: Unauthorized (invalid API key)
-- `403`: Forbidden (insufficient permissions)
-- `404`: Not Found (payment/resource not found)
-- `429`: Too Many Requests (rate limit exceeded)
-- `500`: Internal Server Error
-
-## Monitoring & Logging
-
-### Health Check
-**GET** `/health`
-
-Response:
-```json
-{
-  "status": "OK",
-  "timestamp": "2025-06-08T12:00:00.000Z",
-  "version": "1.0.0",
-  "environment": "production"
-}
-```
-
-### API Documentation
-**GET** `/api/docs`
-
-Menampilkan dokumentasi API lengkap dengan semua endpoints dan permissions.
-
-### Authentication Test
-**GET** `/api/auth/test`
-
-Test endpoint untuk verifikasi API key:
-```json
-{
-  "success": true,
-  "message": "Authentication successful",
-  "data": {
-    "keyName": "Default Admin Key",
-    "permissions": ["admin", "payment:create", "payment:verify", "payment:status", "payment:balance"],
-    "lastUsed": "2025-06-08T12:00:00.000Z"
-  }
-}
-```
-
-### Logs
-- Request/response logs dengan Morgan
-- Payment status changes
-- Transaction verifications  
-- Error logs dengan stack trace
-- API key usage tracking
-
-## Production Deployment
-
-### 1. Environment Setup
-```bash
-NODE_ENV=production
-PORT=3000
-```
-
-### 2. Process Manager (PM2)
-```bash
-npm install -g pm2
-pm2 start app.js --name "crypto-payment"
-pm2 startup
-pm2 save
-```
-
-### 3. Reverse Proxy (Nginx)
-```nginx
-server {
-    listen 443 ssl;
-    server_name your-domain.com;
-    
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/private.key;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-### 4. SSL Certificate
-```bash
-certbot --nginx -d your-domain.com
-```
-
-### 5. Firewall Setup
-```bash
-# UFW
-ufw allow 22/tcp
-ufw allow 80/tcp  
-ufw allow 443/tcp
-ufw enable
-
-# Fail2ban untuk protection
-apt install fail2ban
-```
+### Rate Limiting
+- Default: 100 requests per 15 menit per IP
+- Dapat dikonfigurasi via environment variables
+- Rate limit berlaku per endpoint
 
 ## Testing
 
+### Unit Tests
+```bash
+npm test
+```
+
+### Integration Tests
+```bash
+npm run test:integration
+```
+
 ### Manual Testing dengan cURL
 
-1. **Test Authentication**:
-```bash
-curl -X GET http://localhost:3000/api/auth/test \
-  -H "X-API-Key: your_api_key"
-```
-
-2. **Create Payment**:
+**Create Payment:**
 ```bash
 curl -X POST http://localhost:3000/api/payment/create \
-  -H "X-API-Key: your_api_key" \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key" \
   -d '{
-    "amount": 10.5,
-    "orderId": "TEST001",
-    "metadata": {"test": true}
+    "amount": 10.50,
+    "orderId": "TEST-001"
   }'
 ```
 
-3. **Check Status**:
+**Check Status:**
 ```bash
-curl -X GET http://localhost:3000/api/payment/status/PAYMENT_ID \
-  -H "X-API-Key: your_api_key"
-```
-
-4. **Check Balance**:
-```bash
-curl -X GET http://localhost:3000/api/payment/balance \
-  -H "X-API-Key: your_api_key"
-```
-
-5. **Create API Key**:
-```bash
-curl -X POST http://localhost:3000/api/keys/create \
-  -H "X-API-Key: admin_api_key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Key",
-    "permissions": ["payment:create", "payment:status"]
-  }'
-```
-
-## Network Configuration
-
-### BSC Mainnet Configuration
-```env
-BSC_RPC_URL=https://bsc-dataseed1.binance.org/
-USDT_CONTRACT_ADDRESS=0x55d398326f99059fF775485246999027B3197955
-MIN_CONFIRMATIONS=12
-```
-
-### BSC Testnet Configuration (untuk testing)
-```env
-BSC_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545/
-USDT_CONTRACT_ADDRESS=0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
-MIN_CONFIRMATIONS=3
+curl -X GET http://localhost:3000/api/payment/status/pay_1234567890 \
+  -H "X-API-Key: your-api-key"
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"API key required"**
-   - Pastikan header `X-API-Key` atau `Authorization: Bearer` ada
-   - Cek apakah API key valid dan aktif
-   - Use `/api/auth/test` untuk test authentication
+#### 1. "Invalid API Key"
+- Pastikan API key benar di environment variable
+- Check header `X-API-Key` di request
 
-2. **"Transaction not found"**
-   - Pastikan RPC URL benar dan accessible
-   - Cek apakah transaksi sudah di-broadcast ke network
-   - Tunggu beberapa block confirmation
-   - Pastikan menggunakan BSC network, bukan Ethereum
+#### 2. "RPC Error"
+- Pastikan BSC_RPC_URL dapat diakses
+- Coba gunakan RPC URL alternatif
+- Check koneksi internet
 
-3. **"Invalid transaction"**
-   - Pastikan amount exact sesuai dengan unique amount
-   - Cek contract address USDT BSC
-   - Pastikan menggunakan BSC network
-   - Pastikan wallet address tujuan benar
+#### 3. "Insufficient Gas"
+- Pastikan wallet memiliki saldo BNB untuk gas fees
+- Minimum 0.001 BNB direkomendasikan
 
-4. **"Payment not found"**
-   - Cek paymentId yang digunakan (harus UUID format)
-   - Payment mungkin sudah expired
-   - Restart aplikasi jika menggunakan memory storage
-   - Cek permission API key untuk akses payment
+#### 4. "Payment Not Found"
+- Check payment ID benar
+- Payment mungkin sudah expired (default 30 menit)
 
-5. **"Rate limit exceeded"**
-   - Kurangi frequency request
-   - Implementasi exponential backoff
-   - Check rate limit settings di environment
-   - Gunakan API key berbeda jika memungkinkan
+#### 5. "Webhook Not Received"
+- Pastikan webhook URL dapat diakses dari internet
+- Check firewall dan port configuration
+- Verifikasi webhook signature
 
-6. **"Insufficient permissions"**
-   - Cek permission API key dengan `/api/keys/info`
-   - Gunakan admin API key untuk admin endpoints
-   - Request permission baru dari admin
+### Logs
 
-7. **"Wallet balance issues"**
-   - Pastikan wallet memiliki BNB untuk gas fees
-   - Cek network connectivity ke BSC RPC
-   - Verifikasi wallet address dan private key
+Check application logs untuk debugging:
+```bash
+# Development
+npm run dev
 
-### Debug Mode
-Set environment variable untuk debug:
-```env
-NODE_ENV=development
-DEBUG=*
+# Production dengan PM2
+pm2 logs crypto-payment-gateway
 ```
 
-### RPC Issues
-Jika RPC bermasalah, coba alternative:
-```env
-# Primary
-BSC_RPC_URL=https://bsc-dataseed1.binance.org/
+## Production Deployment
 
-# Alternatives
-BSC_RPC_URL=https://bsc-dataseed2.binance.org/
-BSC_RPC_URL=https://bsc-dataseed3.binance.org/
-BSC_RPC_URL=https://rpc.ankr.com/bsc
+### Using PM2
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start application
+pm2 start app.js --name crypto-payment-gateway
+
+# Monitor
+pm2 monit
+
+# Logs
+pm2 logs crypto-payment-gateway
 ```
 
-### Memory vs Persistent Storage
-Aplikasi menggunakan in-memory storage. Untuk production, pertimbangkan:
-- MongoDB untuk persistent payment storage
-- Redis untuk caching dan session management
-- Regular backup unique amounts
+### Using Docker
+```dockerfile
+FROM node:18-alpine
 
-## Performance Optimization
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
 
-### 1. Rate Limiting
-- Global rate limiting: 200 req/15 min per IP
-- API key rate limiting: 100 req/15 min per key
-- Adjustable via environment variables
+COPY . .
+EXPOSE 3000
 
-### 2. Caching
-- Payment data cached in memory
-- Wallet balance caching (consider Redis)
-- QR code generation caching
+CMD ["npm", "start"]
+```
 
-### 3. Database Optimization
-- Index payment IDs dan status
-- Cleanup expired payments
-- Archive confirmed payments
+### Environment Setup
+- Gunakan HTTPS di production
+- Setup reverse proxy (Nginx/Apache)
+- Configure firewall rules
+- Setup monitoring dan alerting
+- Regular backup untuk database
 
 ## Contributing
 
 1. Fork repository
 2. Create feature branch: `git checkout -b feature/new-feature`
 3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Create Pull Request
-
-### Development Guidelines
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Test on both mainnet dan testnet
+4. Push branch: `git push origin feature/new-feature`
+5. Submit Pull Request
 
 ## License
 
-MIT License - lihat file LICENSE untuk detail lengkap.
+MIT License - lihat file [LICENSE](LICENSE) untuk detail.
 
 ## Support
 
-Untuk support dan pertanyaan:
-- Create issue di GitHub repository
-- Instagram: @AOL_RA
+- 📧 Email: support@yourcompany.com
+- 💬 Discord: [Join our server](https://discord.gg/yourserver)
+- 📖 Documentation: [docs.yourcompany.com](https://docs.yourcompany.com)
+- 🐛 Issues: [GitHub Issues](https://github.com/Pendetot/Crypto-Payment-Gateway/issues)
 
----
+## Changelog
 
-**⚠️ Security Note:** Pastikan untuk:
-- Tidak pernah commit file `.env` ke repository
-- Gunakan strong passwords dan secrets
-- Regular update dependencies
-- Monitor logs untuk suspicious activities
-- Backup private keys secara aman
+Untuk melihat riwayat perubahan lengkap, baca [CHANGELOG.md](./CHANGELOG.md).
