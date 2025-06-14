@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2024-12-19
+
+### Added
+- File .env.example untuk memudahkan konfigurasi environment
+- Contoh kode PHP lengkap di folder example/ untuk integrasi payment gateway
+- Dokumentasi yang lebih komprehensif untuk setup dan konfigurasi
+
+### Changed
+- Perbaikan link dokumentasi di README.md
+- Peningkatan struktur dokumentasi untuk kemudahan penggunaan
+- README.md disederhanakan dan dibuat full bahasa Indonesia
+
+### Fixed
+- Perbaikan link yang rusak dalam dokumentasi
+- Sinkronisasi antara dokumentasi dengan struktur project aktual
+- Perbaikan format dan konsistensi dokumentasi
+
+### Documentation
+- Penambahan contoh integrasi PHP yang lengkap
+- Perbaikan dokumentasi setup environment
+- Peningkatan clarity dalam panduan instalasi
+
 ## [1.2.0] - 2024-06-14
 
 ### Added
@@ -79,6 +101,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation** for documentation changes
 
 ## Migration Guide
+
+### From v1.2.0 to v1.3.0
+No breaking changes in functionality. Updates include:
+- New .env.example file for easier setup
+- Enhanced PHP integration examples
+- Simplified Indonesian documentation
 
 ### From v1.1.0 to v1.2.0
 No breaking changes in functionality. Only documentation updates:
