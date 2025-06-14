@@ -1,74 +1,74 @@
-# Sandbox Mode
+# Mode Sandbox
 
-The Crypto Payment Gateway includes a comprehensive sandbox mode for safe testing and development without using real cryptocurrency transactions.
+Gateway Pembayaran Kripto menyertakan mode sandbox yang komprehensif untuk pengujian dan pengembangan yang aman tanpa menggunakan transaksi cryptocurrency nyata.
 
-## Features
+## Fitur
 
-- **Mock Payment Processing**: Create and manage payments without real blockchain transactions
-- **Simulated Transaction Verification**: Test payment verification with mock transaction hashes
-- **Safe Testing Environment**: No risk of losing real funds during development
-- **Sandbox-Specific Endpoints**: Additional API endpoints for testing scenarios
-- **Visual Indicators**: Orange QR codes and clear sandbox labeling
+- **Pemrosesan Pembayaran Tiruan**: Membuat dan mengelola pembayaran tanpa transaksi blockchain nyata
+- **Simulasi Verifikasi Transaksi**: Menguji verifikasi pembayaran dengan hash transaksi tiruan
+- **Lingkungan Pengujian Aman**: Tidak ada risiko kehilangan dana nyata selama pengembangan
+- **Endpoint Khusus Sandbox**: Endpoint API tambahan untuk skenario pengujian
+- **Indikator Visual**: Kode QR berwarna oranye dan label sandbox yang jelas
 
-## Getting Started
+## Memulai
 
-### Enable Sandbox Mode
+### Mengaktifkan Mode Sandbox
 
-Set one of the following environment variables:
+Atur salah satu variabel lingkungan berikut:
 
 ```bash
-# Option 1: Set NODE_ENV to sandbox
+# Opsi 1: Atur NODE_ENV ke sandbox
 NODE_ENV=sandbox
 
-# Option 2: Use SANDBOX_MODE flag
+# Opsi 2: Gunakan flag SANDBOX_MODE
 SANDBOX_MODE=true
 
-# Option 3: Set ENVIRONMENT variable
+# Opsi 3: Atur variabel ENVIRONMENT
 ENVIRONMENT=sandbox
 ```
 
-### Running in Sandbox Mode
+### Menjalankan dalam Mode Sandbox
 
 ```bash
-# Start in sandbox mode
+# Mulai dalam mode sandbox
 npm run sandbox
 
-# Development mode with auto-reload
+# Mode pengembangan dengan auto-reload
 npm run sandbox:dev
 ```
 
-## Sandbox vs Production
+## Sandbox vs Produksi
 
-| Feature | Production | Sandbox |
-|---------|------------|---------|
-| Blockchain | BSC Mainnet | Mock/Simulated |
-| Transactions | Real USDT | Simulated |
-| Wallet | Real wallet address | Mock wallet |
-| QR Codes | Black | Orange (visual indicator) |
-| Payment Timeout | Configurable | 30 minutes |
-| Confirmations | Real blockchain | Simulated (3 confirmations) |
+| Fitur | Produksi | Sandbox |
+|-------|----------|---------|
+| Blockchain | BSC Mainnet | Tiruan/Simulasi |
+| Transaksi | USDT Nyata | Simulasi |
+| Dompet | Alamat dompet nyata | Dompet tiruan |
+| Kode QR | Hitam | Oranye (indikator visual) |
+| Timeout Pembayaran | Dapat dikonfigurasi | 30 menit |
+| Konfirmasi | Blockchain nyata | Simulasi (3 konfirmasi) |
 
-## API Endpoints
+## Endpoint API
 
-### Sandbox-Specific Endpoints
+### Endpoint Khusus Sandbox
 
-All sandbox endpoints are only available when running in sandbox mode.
+Semua endpoint sandbox hanya tersedia saat berjalan dalam mode sandbox.
 
-#### Get Sandbox Information
+#### Mendapatkan Informasi Sandbox
 ```http
 GET /api/sandbox/info
 ```
 
-Returns sandbox environment details and statistics.
+Mengembalikan detail lingkungan sandbox dan statistik.
 
-#### Simulate Payment
+#### Simulasi Pembayaran
 ```http
 POST /api/sandbox/simulate/{paymentId}
 ```
 
-Automatically completes a payment with a mock transaction.
+Secara otomatis menyelesaikan pembayaran dengan transaksi tiruan.
 
-#### Create Test Payment
+#### Membuat Pembayaran Uji
 ```http
 POST /api/sandbox/test-payment
 Content-Type: application/json
@@ -81,27 +81,27 @@ X-API-Key: your-api-key
 }
 ```
 
-#### Get All Sandbox Payments
+#### Mendapatkan Semua Pembayaran Sandbox
 ```http
 GET /api/sandbox/payments
 X-API-Key: admin-api-key
 ```
 
-#### Clear All Sandbox Data
+#### Menghapus Semua Data Sandbox
 ```http
 DELETE /api/sandbox/payments
 X-API-Key: admin-api-key
 ```
 
-#### Get Sandbox Statistics
+#### Mendapatkan Statistik Sandbox
 ```http
 GET /api/sandbox/stats
 X-API-Key: your-api-key
 ```
 
-## Testing Workflow
+## Alur Kerja Pengujian
 
-### 1. Create a Test Payment
+### 1. Membuat Pembayaran Uji
 
 ```bash
 curl -X POST http://localhost:3000/api/payment/create   -H "Content-Type: application/json"   -H "X-API-Key: your-api-key"   -d '{
@@ -110,77 +110,77 @@ curl -X POST http://localhost:3000/api/payment/create   -H "Content-Type: applic
   }'
 ```
 
-### 2. Simulate Payment Completion
+### 2. Simulasi Penyelesaian Pembayaran
 
 ```bash
 curl -X POST http://localhost:3000/api/sandbox/simulate/{paymentId}   -H "X-API-Key: your-api-key"
 ```
 
-### 3. Check Payment Status
+### 3. Memeriksa Status Pembayaran
 
 ```bash
 curl -X GET http://localhost:3000/api/payment/status/{paymentId}   -H "X-API-Key: your-api-key"
 ```
 
-## Environment Detection
+## Deteksi Lingkungan
 
-The application automatically detects sandbox mode and displays appropriate indicators:
+Aplikasi secara otomatis mendeteksi mode sandbox dan menampilkan indikator yang sesuai:
 
-- **Health Check**: `/health` endpoint shows current environment
-- **API Documentation**: `/api/docs` includes sandbox endpoints when active
-- **Console Output**: Clear indication of sandbox vs production mode
-- **QR Codes**: Orange color scheme for sandbox payments
+- **Health Check**: Endpoint `/health` menunjukkan lingkungan saat ini
+- **Dokumentasi API**: `/api/docs` menyertakan endpoint sandbox saat aktif
+- **Output Konsol**: Indikasi yang jelas antara mode sandbox vs produksi
+- **Kode QR**: Skema warna oranye untuk pembayaran sandbox
 
-## Mock Data
+## Data Tiruan
 
-### Sandbox Wallet Address
+### Alamat Dompet Sandbox
 ```
 0x742d35Cc6634C0532925a3b8D4C9db96590c0000
 ```
 
-### Mock Transaction Hashes
-Sandbox generates realistic-looking transaction hashes:
+### Hash Transaksi Tiruan
+Sandbox menghasilkan hash transaksi yang terlihat realistis:
 ```
 0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890
 ```
 
-### Mock Balances
-- **BNB**: Random balance between 1-11 BNB
-- **USDT**: Random balance between 100-1100 USDT
+### Saldo Tiruan
+- **BNB**: Saldo acak antara 1-11 BNB
+- **USDT**: Saldo acak antara 100-1100 USDT
 
-## Best Practices
+## Praktik Terbaik
 
-1. **Always Use Sandbox for Development**: Never test with real funds
-2. **Clear Sandbox Data**: Use `DELETE /api/sandbox/payments` between test sessions
-3. **Monitor Sandbox Stats**: Use `/api/sandbox/stats` to track test progress
-4. **Test Different Scenarios**: Use various amounts and order IDs
-5. **Verify Environment**: Check `/health` endpoint to confirm sandbox mode
+1. **Selalu Gunakan Sandbox untuk Pengembangan**: Jangan pernah menguji dengan dana nyata
+2. **Bersihkan Data Sandbox**: Gunakan `DELETE /api/sandbox/payments` di antara sesi pengujian
+3. **Pantau Statistik Sandbox**: Gunakan `/api/sandbox/stats` untuk melacak kemajuan pengujian
+4. **Uji Skenario Berbeda**: Gunakan berbagai jumlah dan ID pesanan
+5. **Verifikasi Lingkungan**: Periksa endpoint `/health` untuk mengonfirmasi mode sandbox
 
-## Troubleshooting
+## Pemecahan Masalah
 
-### Sandbox Endpoints Return 403
-- Ensure `NODE_ENV=sandbox` or `SANDBOX_MODE=true` is set
-- Restart the application after changing environment variables
+### Endpoint Sandbox Mengembalikan 403
+- Pastikan `NODE_ENV=sandbox` atau `SANDBOX_MODE=true` telah diatur
+- Restart aplikasi setelah mengubah variabel lingkungan
 
-### Mock Transactions Not Working
-- Verify you're using sandbox-specific endpoints
-- Check that payment exists and is in "pending" status
+### Transaksi Tiruan Tidak Berfungsi
+- Verifikasi bahwa Anda menggunakan endpoint khusus sandbox
+- Periksa bahwa pembayaran ada dan dalam status "pending"
 
-### QR Codes Still Black
-- Confirm sandbox mode is active via `/api/sandbox/info`
-- Clear browser cache if testing in browser
+### Kode QR Masih Hitam
+- Konfirmasi mode sandbox aktif melalui `/api/sandbox/info`
+- Bersihkan cache browser jika menguji di browser
 
-## Security Notes
+## Catatan Keamanan
 
-- Sandbox mode is for development only
-- Never use sandbox configuration in production
-- Sandbox data is stored in memory and will be lost on restart
-- Mock transactions have no real blockchain validation
+- Mode sandbox hanya untuk pengembangan
+- Jangan pernah gunakan konfigurasi sandbox dalam produksi
+- Data sandbox disimpan dalam memori dan akan hilang saat restart
+- Transaksi tiruan tidak memiliki validasi blockchain nyata
 
-## Integration Testing
+## Pengujian Integrasi
 
 ```javascript
-// Example test using sandbox mode
+// Contoh pengujian menggunakan mode sandbox
 const response = await fetch('/api/sandbox/test-payment', {
   method: 'POST',
   headers: {
@@ -196,13 +196,13 @@ const response = await fetch('/api/sandbox/test-payment', {
 const payment = await response.json();
 const paymentId = payment.data.paymentId;
 
-// Simulate payment completion
+// Simulasi penyelesaian pembayaran
 await fetch(`/api/sandbox/simulate/${paymentId}`, {
   method: 'POST',
   headers: { 'X-API-Key': 'test-key' }
 });
 
-// Verify payment status
+// Verifikasi status pembayaran
 const status = await fetch(`/api/payment/status/${paymentId}`, {
   headers: { 'X-API-Key': 'test-key' }
 });
