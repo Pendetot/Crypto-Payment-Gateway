@@ -26,6 +26,7 @@ Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 ```
 crypto-payment-gateway/
 ├── app.js                  # Main application entry point
+├── .env.example            # Environment template
 ├── package.json            # Dependencies dan scripts
 ├── package-lock.json       # Lock file untuk dependencies
 ├── LICENSE                 # License file
