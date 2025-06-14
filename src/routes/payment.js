@@ -22,7 +22,7 @@ router.post('/create', authenticateAPI('payment:create'), async (req, res) => {
     const enhancedMetadata = {
       ...metadata,
       apiKeyName: req.apiKey.name,
-      requestedBy: req.apiKey.key.substring(0, 8) + '...',
+      requestedBy: req.apiKey.keyHash ? req.apiKey.keyHash.substring(0, 8) + '...' : 'unknown',
       requestedAt: new Date().toISOString()
     };
 

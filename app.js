@@ -12,8 +12,9 @@ const sandboxRoutes = require('./src/routes/sandbox');
 const emailRoutes = require('./src/routes/email');
 
 const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler');
-const { authenticateAPI, defaultAPIKey } = require('./src/middleware/auth');
+const { authenticateAPI, getDefaultAPIKey } = require('./src/middleware/auth');
 const PaymentServiceFactory = require('./src/services/paymentServiceFactory');
+const databaseService = require('./src/services/databaseService');
 
 const app = express();
 
@@ -230,26 +231,48 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
-const server = app.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running on ${HOST}:${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api/docs`);
-  console.log(`🔑 Default API Key: ${defaultAPIKey}`);
-  console.log(`💡 Add API_KEY=${defaultAPIKey} to your .env file`);
-});
 
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
-});
+// Initialize database before starting server
+async function startServer() {
+  try {
+    // Initialize database
+    await databaseService.initialize();
+    
+    // Initialize API key after database is ready
+    const defaultAPIKey = await getDefaultAPIKey();
+    
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`🚀 Server running on ${HOST}:${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`📚 API Documentation: http://localhost:${PORT}/api/docs`);
+      console.log(`🔑 Default API Key: ${defaultAPIKey}`);
+      console.log(`💡 Add API_KEY=${defaultAPIKey} to your .env file`);
+    });
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
-});
+    // Graceful shutdown handlers
+    process.on('SIGTERM', async () => {
+      console.log('SIGTERM received, shutting down gracefully');
+      await databaseService.close();
+      server.close(() => {
+        console.log('Process terminated');
+      });
+    });
+
+    process.on('SIGINT', async () => {
+      console.log('SIGINT received, shutting down gracefully');
+      await databaseService.close();
+      server.close(() => {
+        console.log('Process terminated');
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();
 
 module.exports = app;

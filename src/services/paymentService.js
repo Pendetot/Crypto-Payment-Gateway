@@ -2,17 +2,16 @@ const { Web3 } = require('web3');
 const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 const { validatePaymentRequest } = require('../validators/paymentValidator');
+const databaseService = require('./databaseService');
 
 class PaymentService {
   constructor() {
     this.web3 = new Web3(process.env.BSC_RPC_URL);
     this.usdtContract = process.env.USDT_CONTRACT_ADDRESS;
     this.walletAddress = process.env.WALLET_ADDRESS;
-    this.pendingPayments = new Map();
-    this.usedUniqueAmounts = new Set();
   }
 
-  generateUniqueAmount(originalAmount) {
+  async generateUniqueAmount(originalAmount) {
     let attempts = 0;
     let uniqueAmount;
     
@@ -28,13 +27,11 @@ class PaymentService {
         uniqueAmount = parseFloat((originalAmount + (timestamp / 100)).toFixed(2));
         break;
       }
-    } while (this.usedUniqueAmounts.has(uniqueAmount));
+    } while (await databaseService.isAmountUsed(uniqueAmount));
     
-    this.usedUniqueAmounts.add(uniqueAmount);
-    
-    setTimeout(() => {
-      this.usedUniqueAmounts.delete(uniqueAmount);
-    }, 24 * 60 * 60 * 1000);
+    // Add to database with 24 hour expiry
+    const expiresAt = new Date(Date.now() + (24 * 60 * 60 * 1000));
+    await databaseService.addUsedAmount(uniqueAmount, expiresAt);
     
     return uniqueAmount;
   }
@@ -43,7 +40,7 @@ class PaymentService {
     const paymentId = uuidv4();
     const expiresAt = new Date(Date.now() + (process.env.PAYMENT_TIMEOUT * 1000));
     
-    const uniqueAmount = this.generateUniqueAmount(parseFloat(amount));
+    const uniqueAmount = await this.generateUniqueAmount(parseFloat(amount));
     
     const paymentData = {
       id: paymentId,
@@ -66,8 +63,10 @@ class PaymentService {
     paymentData.trustWalletUrl = trustWalletUrl;
     paymentData.qrCode = qrCode;
 
-    this.pendingPayments.set(paymentId, paymentData);
+    // Save to database
+    await databaseService.createPayment(paymentData);
     
+    // Set expiration timer
     setTimeout(() => {
       this.expirePayment(paymentId);
     }, process.env.PAYMENT_TIMEOUT * 1000);
@@ -105,7 +104,7 @@ class PaymentService {
 
   async verifyPayment(paymentId, txHash) {
     try {
-      const payment = this.pendingPayments.get(paymentId);
+      const payment = await databaseService.getPayment(paymentId);
       if (!payment) {
         throw new Error('Payment not found');
       }
@@ -131,14 +130,27 @@ class PaymentService {
 
       const confirmations = await this.getConfirmations(txHash);
       
-      payment.txHash = txHash;
-      payment.confirmations = confirmations;
-      payment.status = confirmations >= process.env.MIN_CONFIRMATIONS ? 'confirmed' : 'pending_confirmation';
-      payment.verifiedAt = new Date();
+      const updates = {
+        tx_hash: txHash,
+        confirmations: confirmations,
+        status: confirmations >= process.env.MIN_CONFIRMATIONS ? 'confirmed' : 'pending_confirmation',
+        verified_at: new Date().toISOString()
+      };
 
-      this.pendingPayments.set(paymentId, payment);
+      await databaseService.updatePayment(paymentId, updates);
       
-      return payment;
+      // Log transaction
+      await databaseService.logTransaction({
+        paymentId,
+        txHash,
+        status: updates.status,
+        confirmations,
+        blockNumber: transaction.blockNumber,
+        gasUsed: receipt.gasUsed,
+        gasPrice: transaction.gasPrice
+      });
+      
+      return await databaseService.getPayment(paymentId);
     } catch (error) {
       throw new Error(`Payment verification failed: ${error.message}`);
     }
@@ -165,14 +177,10 @@ class PaymentService {
     }
   }
 
-  findPaymentByAmount(amount) {
-    const numAmount = parseFloat(amount);
-    
-    for (const [paymentId, payment] of this.pendingPayments) {
-      if (payment.status === 'pending' && 
-          parseFloat(payment.amount) === numAmount) {
-        return { paymentId, payment };
-      }
+  async findPaymentByAmount(amount) {
+    const payment = await databaseService.findPaymentByAmount(parseFloat(amount));
+    if (payment) {
+      return { paymentId: payment.id, payment };
     }
     return null;
   }
@@ -191,18 +199,24 @@ class PaymentService {
     }
   }
 
-  getPayment(paymentId) {
-    return this.pendingPayments.get(paymentId);
+  async getPayment(paymentId) {
+    return await databaseService.getPayment(paymentId);
   }
 
-  expirePayment(paymentId) {
-    const payment = this.pendingPayments.get(paymentId);
+  async expirePayment(paymentId) {
+    const payment = await databaseService.getPayment(paymentId);
     if (payment && payment.status === 'pending') {
-      payment.status = 'expired';
-      this.pendingPayments.set(paymentId, payment);
-            
-      this.usedUniqueAmounts.delete(parseFloat(payment.amount));
+      await databaseService.updatePayment(paymentId, { 
+        status: 'expired' 
+      });
+      
+      // Remove from used amounts
+      await databaseService.removeUsedAmount(parseFloat(payment.amount));
     }
+  }
+
+  async getAllPayments(status = null) {
+    return await databaseService.getAllPayments(status);
   }
 
   async getWalletBalance() {
