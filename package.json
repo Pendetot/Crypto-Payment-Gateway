@@ -1,7 +1,7 @@
 {
   "name": "crypto-payment-gateway",
   "version": "1.0.0",
-  "description": "Crypto Payment Gateway with Trust Wallet BSC-20 USDT Integration",
+  "description": "Gateway Pembayaran Cryptocurrency dengan Integrasi Trust Wallet BSC-20 USDT",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -12,11 +12,15 @@
   },
   "keywords": [
     "crypto",
+    "cryptocurrency",
     "payment",
+    "pembayaran",
     "gateway",
     "bsc",
     "usdt",
-    "trustwallet"
+    "trustwallet",
+    "blockchain",
+    "indonesia"
   ],
   "author": "Pendetot",
   "license": "MIT",
