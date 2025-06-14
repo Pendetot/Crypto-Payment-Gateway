@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.3.0] - 2024-12-19
+## [1.3.0] - 2025-06-14
 
 ### Added
 - File .env.example untuk memudahkan konfigurasi environment
@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Perbaikan dokumentasi setup environment
 - Peningkatan clarity dalam panduan instalasi
 
-## [1.2.0] - 2024-06-14
+## [1.2.0] - 2025-06-14
 
 ### Added
 - Comprehensive project structure documentation in README.md
