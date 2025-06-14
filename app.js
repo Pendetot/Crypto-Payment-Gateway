@@ -9,6 +9,7 @@ const paymentRoutes = require('./src/routes/payment');
 const webhookRoutes = require('./src/routes/webhook');
 const apiKeyRoutes = require('./src/routes/apiKeys');
 const sandboxRoutes = require('./src/routes/sandbox');
+const emailRoutes = require('./src/routes/email');
 
 const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler');
 const { authenticateAPI, defaultAPIKey } = require('./src/middleware/auth');
@@ -64,6 +65,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/keys', apiKeyRoutes);
 app.use('/api/sandbox', sandboxRoutes);
+app.use('/api/email', emailRoutes);
 
 app.get('/health', (req, res) => {
   const envInfo = PaymentServiceFactory.getEnvironmentInfo();
@@ -159,7 +161,44 @@ app.get('/api/docs', (req, res) => {
             description: 'Create test payment with scenarios',
             permission: 'payment:create'
           }
-        } : undefined
+        } : undefined,
+        email: {
+          'POST /api/email/test': {
+            description: 'Send test email (Admin only)',
+            permission: 'admin',
+            body: {
+              email: 'string (required)'
+            }
+          },
+          'POST /api/email/payment-created': {
+            description: 'Send payment created notification',
+            permission: 'payment:create',
+            body: {
+              email: 'string (required)',
+              paymentData: 'object (required)'
+            }
+          },
+          'POST /api/email/payment-success': {
+            description: 'Send payment success notification',
+            permission: 'payment:verify',
+            body: {
+              email: 'string (required)',
+              paymentData: 'object (required)'
+            }
+          },
+          'POST /api/email/payment-expired': {
+            description: 'Send payment expired notification',
+            permission: 'payment:create',
+            body: {
+              email: 'string (required)',
+              paymentData: 'object (required)'
+            }
+          },
+          'GET /api/email/status': {
+            description: 'Get email service status (Admin only)',
+            permission: 'admin'
+          }
+        }
       },
       permissions: [
         'payment:create - Create new payments',
