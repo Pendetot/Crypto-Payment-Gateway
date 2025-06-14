@@ -1,120 +1,120 @@
-# Changelog
+# Catatan Perubahan
 
-All notable changes to this project will be documented in this file.
+Semua perubahan penting pada proyek ini akan didokumentasikan dalam file ini.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Format ini berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Belum Dirilis]
 
 ## [1.3.0] - 2025-06-14
 
-### Added
+### Ditambahkan
 - File .env.example untuk memudahkan konfigurasi environment
 - Contoh kode PHP lengkap di folder example/ untuk integrasi payment gateway
 - Dokumentasi yang lebih komprehensif untuk setup dan konfigurasi
 
-### Changed
+### Diubah
 - Perbaikan link dokumentasi di README.md
 - Peningkatan struktur dokumentasi untuk kemudahan penggunaan
 - README.md disederhanakan dan dibuat full bahasa Indonesia
 
-### Fixed
+### Diperbaiki
 - Perbaikan link yang rusak dalam dokumentasi
 - Sinkronisasi antara dokumentasi dengan struktur project aktual
 - Perbaikan format dan konsistensi dokumentasi
 
-### Documentation
+### Dokumentasi
 - Penambahan contoh integrasi PHP yang lengkap
 - Perbaikan dokumentasi setup environment
 - Peningkatan clarity dalam panduan instalasi
 
 ## [1.2.0] - 2025-06-14
 
-### Added
-- Comprehensive project structure documentation in README.md
-- Detailed file and directory descriptions for better code navigation
-- Enhanced documentation for all service files and their purposes
+### Ditambahkan
+- Dokumentasi struktur proyek yang komprehensif di README.md
+- Deskripsi file dan direktori yang detail untuk navigasi kode yang lebih baik
+- Dokumentasi yang ditingkatkan untuk semua file service dan tujuannya
 
-### Changed
-- **BREAKING**: Updated project structure section in README.md to reflect actual repository structure
-- Moved app.js documentation from src/ to root level (matches actual file location)
-- Enhanced descriptions for middleware, routes, services, and validators
-- Improved clarity of file organization and architecture
+### Diubah
+- **BREAKING**: Memperbarui bagian struktur proyek di README.md untuk mencerminkan struktur repository yang sebenarnya
+- Memindahkan dokumentasi app.js dari src/ ke level root (sesuai lokasi file sebenarnya)
+- Meningkatkan deskripsi untuk middleware, routes, services, dan validators
+- Meningkatkan kejelasan organisasi file dan arsitektur
 
-### Fixed
-- Corrected inaccurate file paths in project structure documentation
-- Fixed missing files in documentation (LICENSE, package-lock.json)
-- Aligned documentation with actual codebase structure
+### Diperbaiki
+- Memperbaiki path file yang tidak akurat dalam dokumentasi struktur proyek
+- Memperbaiki file yang hilang dalam dokumentasi (LICENSE, package-lock.json)
+- Menyelaraskan dokumentasi dengan struktur codebase yang sebenarnya
 
-### Documentation
-- Added missing route files documentation (email.js, sandbox.js)
-- Enhanced service file descriptions (emailService.js, paymentServiceFactory.js, sandboxPaymentService.js)
-- Improved middleware and validator documentation
-- Updated example directory structure documentation
+### Dokumentasi
+- Menambahkan dokumentasi file route yang hilang (email.js, sandbox.js)
+- Meningkatkan deskripsi file service (emailService.js, paymentServiceFactory.js, sandboxPaymentService.js)
+- Memperbaiki dokumentasi middleware dan validator
+- Memperbarui dokumentasi struktur direktori example
 
-## [1.1.0] - Previous Release
+## [1.1.0] - Rilis Sebelumnya
 
-### Added
-- Email notification system with comprehensive documentation
-- Sandbox mode for testing and development
-- API key management system
-- Webhook handling for payment notifications
-- Rate limiting and security features
-- Clean architecture implementation
+### Ditambahkan
+- Sistem notifikasi email dengan dokumentasi yang komprehensif
+- Mode sandbox untuk testing dan development
+- Sistem manajemen API key
+- Penanganan webhook untuk notifikasi pembayaran
+- Fitur rate limiting dan keamanan
+- Implementasi arsitektur yang bersih
 
-### Features
-- ✅ USDT payments on BSC-20 network
-- ✅ QR Code generation for Trust Wallet integration
-- ✅ Automatic transaction verification
-- ✅ Webhook notifications for payment events
-- ✅ API rate limiting and security
-- ✅ API Key management system
-- ✅ Clean architecture and error handling
+### Fitur
+- ✅ Pembayaran USDT pada jaringan BSC-20
+- ✅ Generasi QR Code untuk integrasi Trust Wallet
+- ✅ Verifikasi transaksi otomatis
+- ✅ Notifikasi webhook untuk event pembayaran
+- ✅ Rate limiting API dan keamanan
+- ✅ Sistem manajemen API Key
+- ✅ Arsitektur bersih dan penanganan error
 
-### Documentation
-- Complete setup and installation guide
-- Environment configuration documentation
-- API endpoint documentation
-- PHP integration examples
-- Troubleshooting guide
+### Dokumentasi
+- Panduan setup dan instalasi lengkap
+- Dokumentasi konfigurasi environment
+- Dokumentasi endpoint API
+- Contoh integrasi PHP
+- Panduan troubleshooting
 
-## [1.0.0] - Initial Release
+## [1.0.0] - Rilis Awal
 
-### Added
-- Core crypto payment gateway functionality
-- BSC USDT payment processing
-- Trust Wallet integration
-- Basic API endpoints
-- Payment verification system
-- Initial documentation
+### Ditambahkan
+- Fungsionalitas inti crypto payment gateway
+- Pemrosesan pembayaran BSC USDT
+- Integrasi Trust Wallet
+- Endpoint API dasar
+- Sistem verifikasi pembayaran
+- Dokumentasi awal
 
 ---
 
-## Types of Changes
-- **Added** for new features
-- **Changed** for changes in existing functionality
-- **Deprecated** for soon-to-be removed features
-- **Removed** for now removed features
-- **Fixed** for any bug fixes
-- **Security** for vulnerability fixes
-- **Documentation** for documentation changes
+## Jenis Perubahan
+- **Ditambahkan** untuk fitur baru
+- **Diubah** untuk perubahan dalam fungsionalitas yang ada
+- **Deprecated** untuk fitur yang akan segera dihapus
+- **Dihapus** untuk fitur yang sekarang sudah dihapus
+- **Diperbaiki** untuk perbaikan bug apapun
+- **Keamanan** untuk perbaikan kerentanan
+- **Dokumentasi** untuk perubahan dokumentasi
 
-## Migration Guide
+## Panduan Migrasi
 
-### From v1.2.0 to v1.3.0
-No breaking changes in functionality. Updates include:
-- New .env.example file for easier setup
-- Enhanced PHP integration examples
-- Simplified Indonesian documentation
+### Dari v1.2.0 ke v1.3.0
+Tidak ada perubahan breaking dalam fungsionalitas. Update meliputi:
+- File .env.example baru untuk setup yang lebih mudah
+- Contoh integrasi PHP yang ditingkatkan
+- Dokumentasi bahasa Indonesia yang disederhanakan
 
-### From v1.1.0 to v1.2.0
-No breaking changes in functionality. Only documentation updates:
-- Review updated project structure in README.md
-- File locations remain the same, only documentation was corrected
+### Dari v1.1.0 ke v1.2.0
+Tidak ada perubahan breaking dalam fungsionalitas. Hanya update dokumentasi:
+- Tinjau struktur proyek yang diperbarui di README.md
+- Lokasi file tetap sama, hanya dokumentasi yang diperbaiki
 
-### Future Releases
-- Database integration (MongoDB/Redis)
-- Enhanced security features
-- Multi-currency support
-- Advanced webhook features
+### Rilis Mendatang
+- Integrasi database (MongoDB/Redis)
+- Fitur keamanan yang ditingkatkan
+- Dukungan multi-currency
+- Fitur webhook yang canggih
