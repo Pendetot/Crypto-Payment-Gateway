@@ -1,19 +1,19 @@
-# Crypto Payment Gateway - BSC USDT
+# 🚀 Crypto Payment Gateway - BSC USDT
 
-Gateway pembayaran crypto untuk menerima pembayaran USDT di jaringan Binance Smart Chain (BSC) dengan integrasi Trust Wallet dan penyimpanan database SQLite3.
+Gateway pembayaran cryptocurrency modern untuk menerima pembayaran USDT di jaringan Binance Smart Chain (BSC) dengan integrasi Trust Wallet dan penyimpanan database SQLite3.
 
 ## ✨ Fitur Utama
 
-- ✅ Pembayaran USDT di jaringan BSC-20
-- ✅ Generate QR Code untuk Trust Wallet
-- ✅ Verifikasi transaksi otomatis
-- ✅ Webhook untuk notifikasi pembayaran
-- ✅ Rate limiting dan keamanan API
-- ✅ Sistem manajemen API Key
-- ✅ **Database SQLite3 untuk penyimpanan persisten**
-- ✅ **Migrasi dari in-memory ke database storage**
-- ✅ Clean architecture dan error handling
-- ✅ Mode sandbox untuk testing
+| Fitur | Status | Deskripsi |
+|-------|--------|-----------|
+| 💰 **USDT BSC-20** | ✅ | Pembayaran USDT di jaringan Binance Smart Chain |
+| 📱 **Trust Wallet** | ✅ | Generate QR Code untuk integrasi Trust Wallet |
+| 🔍 **Auto Verify** | ✅ | Verifikasi transaksi blockchain otomatis |
+| 📡 **Webhooks** | ✅ | Notifikasi real-time untuk pembayaran |
+| 🛡️ **Security** | ✅ | Rate limiting dan autentikasi API Key |
+| 🗄️ **SQLite3 Database** | ✅ | Penyimpanan persisten dengan database |
+| 🔧 **Clean Architecture** | ✅ | Error handling dan struktur kode yang rapi |
+| 🧪 **Sandbox Mode** | ✅ | Mode testing untuk development |
 
 ## 📚 Dokumentasi Lengkap
 
@@ -24,27 +24,44 @@ Gateway pembayaran crypto untuk menerima pembayaran USDT di jaringan Binance Sma
 
 ## 🚀 Instalasi Cepat
 
-### 1. Clone Repository
+### 📋 Prerequisites
+- Node.js >= 16.0.0
+- npm atau yarn
+- Git
+
+### 🔧 Langkah Instalasi
+
+#### 1️⃣ Clone Repository
 ```bash
 git clone https://github.com/Pendetot/Crypto-Payment-Gateway.git
 cd Crypto-Payment-Gateway
 ```
 
-### 2. Install Dependencies
+#### 2️⃣ Install Dependencies
 ```bash
 npm install
 ```
 
-### 3. Setup Environment
+#### 3️⃣ Setup Environment
 ```bash
 cp .env.example .env
-# Edit file .env sesuai konfigurasi Anda
+```
+Edit file `.env` dan sesuaikan dengan konfigurasi Anda:
+- `WALLET_ADDRESS`: Alamat wallet BSC Anda
+- `API_KEY`: Akan di-generate otomatis jika kosong
+
+#### 4️⃣ Jalankan Aplikasi
+```bash
+# Development mode
+npm run dev
+
+# Production mode
+npm start
 ```
 
-### 4. Jalankan Aplikasi
+#### 5️⃣ Verifikasi Installation
 ```bash
-npm run dev  # Development
-npm start    # Production
+curl http://localhost:3000/health
 ```
 
 ## ⚙️ Konfigurasi Environment
@@ -107,7 +124,20 @@ Gunakan MetaMask atau Trust Wallet untuk membuat wallet baru, lalu export privat
 
 ## 🔧 Penggunaan API
 
-### Membuat Pembayaran
+### 🔑 Authentication
+Semua endpoint memerlukan API Key di header:
+```bash
+X-API-Key: your_api_key_here
+```
+
+### 📋 Endpoint Utama
+
+#### 1️⃣ Health Check
+```bash
+curl http://localhost:3000/health
+```
+
+#### 2️⃣ Membuat Pembayaran
 ```bash
 curl -X POST http://localhost:3000/api/payment/create \
   -H "X-API-Key: your_api_key" \
@@ -119,15 +149,29 @@ curl -X POST http://localhost:3000/api/payment/create \
   }'
 ```
 
-### Cek Status Pembayaran
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "paymentId": "uuid-here",
+    "amount": "10.67",
+    "walletAddress": "0x...",
+    "qrCode": "data:image/png;base64,...",
+    "expiresAt": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+#### 3️⃣ Cek Status Pembayaran
 ```bash
-curl -X GET http://localhost:3000/api/payment/status/PAYMENT_ID \
+curl http://localhost:3000/api/payment/status/PAYMENT_ID \
   -H "X-API-Key: your_api_key"
 ```
 
-### Cek Saldo Wallet
+#### 4️⃣ Cek Saldo Wallet
 ```bash
-curl -X GET http://localhost:3000/api/payment/balance \
+curl http://localhost:3000/api/payment/balance \
   -H "X-API-Key: your_api_key"
 ```
 
