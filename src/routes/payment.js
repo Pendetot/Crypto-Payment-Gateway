@@ -1,5 +1,5 @@
 const express = require('express');
-const paymentService = require('../services/paymentService');
+const PaymentServiceFactory = require('../services/paymentServiceFactory');
 const { validatePaymentRequest, validateVerificationRequest } = require('../validators/paymentValidator');
 const { authenticateAPI, rateLimitByAPIKey } = require('../middleware/auth');
 
@@ -26,6 +26,7 @@ router.post('/create', authenticateAPI('payment:create'), async (req, res) => {
       requestedAt: new Date().toISOString()
     };
 
+    const paymentService = PaymentServiceFactory.getPaymentService();
     const payment = await paymentService.createPayment(amount, orderId, enhancedMetadata);
 
     res.json({
@@ -71,6 +72,7 @@ router.post('/verify', authenticateAPI('payment:verify'), async (req, res) => {
     
     console.log(`Payment verification requested by ${req.apiKey.name} for payment ${paymentId}`);
     
+    const paymentService = PaymentServiceFactory.getPaymentService();
     const payment = await paymentService.verifyPayment(paymentId, txHash);
 
     res.json({
@@ -99,6 +101,7 @@ router.post('/verify', authenticateAPI('payment:verify'), async (req, res) => {
 router.get('/status/:paymentId', authenticateAPI('payment:status'), async (req, res) => {
   try {
     const { paymentId } = req.params;
+    const paymentService = PaymentServiceFactory.getPaymentService();
     const payment = paymentService.getPayment(paymentId);
 
     if (!payment) {
@@ -147,6 +150,7 @@ router.get('/status/:paymentId', authenticateAPI('payment:status'), async (req, 
 
 router.get('/balance', authenticateAPI('payment:balance'), async (req, res) => {
   try {
+    const paymentService = PaymentServiceFactory.getPaymentService();
     const [bnbBalance, usdtBalance] = await Promise.all([
       paymentService.getWalletBalance(),
       paymentService.getUSDTBalance()
@@ -184,6 +188,7 @@ router.get('/balance', authenticateAPI('payment:balance'), async (req, res) => {
 router.get('/list', authenticateAPI('admin'), async (req, res) => {
   try {
     const { status, limit = 50, offset = 0 } = req.query;
+    const paymentService = PaymentServiceFactory.getPaymentService();
     
     const payments = Array.from(paymentService.pendingPayments.values())
       .filter(payment => !status || payment.status === status)

@@ -2,10 +2,12 @@
   "name": "crypto-payment-gateway",
   "version": "1.0.0",
   "description": "Crypto Payment Gateway with Trust Wallet BSC-20 USDT Integration",
-  "main": "src/app.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "sandbox": "NODE_ENV=sandbox node app.js",
+    "sandbox:dev": "NODE_ENV=sandbox nodemon app.js",
     "test": "jest"
   },
   "keywords": ["crypto", "payment", "gateway", "bsc", "usdt", "trustwallet"],

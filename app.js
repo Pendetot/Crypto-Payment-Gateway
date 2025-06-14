@@ -5,12 +5,14 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
-const paymentRoutes = require('./routes/payment');
-const webhookRoutes = require('./routes/webhook');
-const apiKeyRoutes = require('./routes/apiKeys');
+const paymentRoutes = require('./src/routes/payment');
+const webhookRoutes = require('./src/routes/webhook');
+const apiKeyRoutes = require('./src/routes/apiKeys');
+const sandboxRoutes = require('./src/routes/sandbox');
 
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-const { authenticateAPI, defaultAPIKey } = require('./middleware/auth');
+const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler');
+const { authenticateAPI, defaultAPIKey } = require('./src/middleware/auth');
+const PaymentServiceFactory = require('./src/services/paymentServiceFactory');
 
 const app = express();
 
@@ -61,13 +63,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/payment', paymentRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/keys', apiKeyRoutes);
+app.use('/api/sandbox', sandboxRoutes);
 
 app.get('/health', (req, res) => {
+  const envInfo = PaymentServiceFactory.getEnvironmentInfo();
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     version: process.env.APP_VERSION || '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    paymentService: envInfo
   });
 });
 
@@ -132,7 +137,29 @@ app.get('/api/docs', (req, res) => {
             description: 'Get current API key info',
             permission: 'any'
           }
-        }
+        },
+        sandbox: PaymentServiceFactory.isSandboxMode() ? {
+          'GET /api/sandbox/info': {
+            description: 'Get sandbox environment information',
+            permission: 'any'
+          },
+          'POST /api/sandbox/simulate/:paymentId': {
+            description: 'Simulate payment completion',
+            permission: 'payment:verify'
+          },
+          'GET /api/sandbox/payments': {
+            description: 'Get all sandbox payments',
+            permission: 'admin'
+          },
+          'DELETE /api/sandbox/payments': {
+            description: 'Clear all sandbox payments',
+            permission: 'admin'
+          },
+          'POST /api/sandbox/test-payment': {
+            description: 'Create test payment with scenarios',
+            permission: 'payment:create'
+          }
+        } : undefined
       },
       permissions: [
         'payment:create - Create new payments',
@@ -140,7 +167,8 @@ app.get('/api/docs', (req, res) => {
         'payment:status - Check payment status',
         'payment:balance - View wallet balance',
         'admin - Full access to all endpoints'
-      ]
+      ],
+      environment: PaymentServiceFactory.getEnvironmentInfo()
     }
   });
 });
