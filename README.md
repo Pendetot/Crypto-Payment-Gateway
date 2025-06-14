@@ -19,16 +19,6 @@ Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 - **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
 - **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
 - **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
->>>>>>> b75cdb0 (Add PHP example folder with comprehensive integration examples)
-=======
-- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
-- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
-- **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
-=======
-- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
-- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
-- **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
->>>>>>> b75cdb0 (Add PHP example folder with comprehensive integration examples)
 
 ## Struktur Project
 
@@ -66,7 +56,6 @@ crypto-payment-gateway/
 1. Clone repository:
 ```bash
 git clone https://github.com/Pendetot/Crypto-Payment-Gateway.git
-     
 cd Crypto-Payment-Gateway
 ```
 
@@ -742,7 +731,7 @@ MIN_CONFIRMATIONS=12
 ```
 
 ### BSC Testnet Configuration (untuk testing)
-```env  
+```env
 BSC_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545/
 USDT_CONTRACT_ADDRESS=0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
 MIN_CONFIRMATIONS=3
