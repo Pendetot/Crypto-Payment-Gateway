@@ -158,7 +158,7 @@ curl -X POST http://localhost:3000/api/payment/create \
     "amount": "10.67",
     "walletAddress": "0x...",
     "qrCode": "data:image/png;base64,...",
-    "expiresAt": "2024-01-01T12:00:00Z"
+    "expiresAt": "2025-01-01T12:00:00Z"
   }
 }
 ```
