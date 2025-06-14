@@ -16,8 +16,19 @@ Payment gateway untuk menerima pembayaran crypto menggunakan USDT di jaringan Bi
 
 Untuk informasi lebih detail, silakan baca dokumentasi berikut:
 
-- **[SANDBOX](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
-- **[EMAIL DOCUMENTATION](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
+- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+- **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
+>>>>>>> b75cdb0 (Add PHP example folder with comprehensive integration examples)
+=======
+- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
+- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+- **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
+=======
+- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
+- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+- **[example/](./example/)** - Contoh kode PHP untuk integrasi payment gateway
+>>>>>>> b75cdb0 (Add PHP example folder with comprehensive integration examples)
 
 ## Struktur Project
 
@@ -40,7 +51,14 @@ crypto-payment-gateway/
 ├── package.json
 ├── README.md               # Dokumentasi utama
 ├── SANDBOX.md              # Dokumentasi mode sandbox
-└── EMAIL_DOCUMENTATION.md  # Dokumentasi sistem email
+├── EMAIL_DOCUMENTATION.md  # Dokumentasi sistem email
+└── example/                # Contoh kode PHP untuk integrasi
+    ├── README.md           # Panduan penggunaan contoh
+    ├── config.php          # Konfigurasi dan helper functions
+    ├── create_payment.php  # Contoh membuat pembayaran
+    ├── check_status.php    # Contoh cek status pembayaran
+    ├── webhook_handler.php # Contoh webhook handler
+    └── complete_example.php # Contoh integrasi lengkap
 ```
 
 ## Installation
