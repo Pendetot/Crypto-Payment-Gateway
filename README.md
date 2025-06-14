@@ -1,6 +1,6 @@
 # Crypto Payment Gateway - BSC USDT
 
-Gateway pembayaran crypto untuk menerima pembayaran USDT di jaringan Binance Smart Chain (BSC) dengan integrasi Trust Wallet.
+Gateway pembayaran crypto untuk menerima pembayaran USDT di jaringan Binance Smart Chain (BSC) dengan integrasi Trust Wallet dan penyimpanan database SQLite3.
 
 ## ✨ Fitur Utama
 
@@ -10,6 +10,8 @@ Gateway pembayaran crypto untuk menerima pembayaran USDT di jaringan Binance Sma
 - ✅ Webhook untuk notifikasi pembayaran
 - ✅ Rate limiting dan keamanan API
 - ✅ Sistem manajemen API Key
+- ✅ **Database SQLite3 untuk penyimpanan persisten**
+- ✅ **Migrasi dari in-memory ke database storage**
 - ✅ Clean architecture dan error handling
 - ✅ Mode sandbox untuk testing
 
@@ -49,26 +51,44 @@ npm start    # Production
 
 ### Konfigurasi Dasar (.env)
 ```env
-# Server
-PORT=3000
-NODE_ENV=development
+# API Configuration
+API_KEY=your_generated_api_key
 
-# Blockchain BSC
+# Blockchain Configuration
 BSC_RPC_URL=https://bsc-dataseed1.binance.org/
 USDT_CONTRACT_ADDRESS=0x55d398326f99059fF775485246999027B3197955
+WALLET_ADDRESS=your_wallet_address
 
-# Wallet
-WALLET_ADDRESS=alamat_wallet_anda
-WALLET_PRIVATE_KEY=private_key_tanpa_0x
-
-# Security
-API_KEY=api_key_anda
-WEBHOOK_SECRET=webhook_secret_anda
-
-# Payment
+# Payment Configuration
 PAYMENT_TIMEOUT=1800
-MIN_CONFIRMATIONS=12
+MIN_CONFIRMATIONS=3
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=900000
+RATE_LIMIT_MAX_REQUESTS=200
+
+# Environment
+NODE_ENV=development
+PORT=3000
+HOST=0.0.0.0
+
+# CORS
+ALLOWED_ORIGINS=*
+
+# Database
+DATABASE_URL=./crypto_payment_gateway.db
 ```
+
+### 🗄️ Database SQLite3
+
+Aplikasi sekarang menggunakan SQLite3 untuk penyimpanan persisten:
+
+- **Payments**: Semua data pembayaran disimpan di database
+- **API Keys**: Manajemen API key dengan enkripsi hash
+- **Used Amounts**: Tracking unique amount untuk mencegah duplikasi
+- **Transaction Logs**: Log semua transaksi untuk audit
+
+Database akan dibuat otomatis saat aplikasi pertama kali dijalankan.
 
 ### Cara Mendapatkan Konfigurasi
 
@@ -168,16 +188,43 @@ DEBUG=*
 
 ```
 crypto-payment-gateway/
-├── app.js                  # Entry point aplikasi
-├── .env.example            # Template environment
-├── package.json            # Dependencies
-├── src/                    # Source code utama
-│   ├── middleware/         # Middleware functions
-│   ├── routes/             # API route handlers
-│   ├── services/           # Business logic
-│   └── validators/         # Input validation
-└── example/                # Contoh integrasi PHP
+├── app.js                          # Entry point aplikasi
+├── .env                            # Environment configuration
+├── package.json                    # Dependencies
+├── crypto_payment_gateway.db       # SQLite3 database file
+├── src/                            # Source code utama
+│   ├── middleware/                 # Middleware functions
+│   │   ├── auth.js                 # Authentication & API key management
+│   │   └── errorHandler.js         # Error handling middleware
+│   ├── routes/                     # API route handlers
+│   │   ├── payment.js              # Payment endpoints
+│   │   ├── webhook.js              # Webhook handlers
+│   │   ├── apiKeys.js              # API key management
+│   │   ├── sandbox.js              # Sandbox mode
+│   │   └── email.js                # Email notifications
+│   ├── services/                   # Business logic
+│   │   ├── databaseService.js      # SQLite3 database operations
+│   │   ├── paymentService.js       # Payment processing
+│   │   ├── paymentServiceFactory.js # Service factory
+│   │   └── emailService.js         # Email service
+│   └── validators/                 # Input validation
+│       └── paymentValidator.js     # Payment validation
+└── example/                        # Contoh integrasi PHP
 ```
+
+## 🗄️ Database Schema
+
+### Tables:
+- **payments**: Data pembayaran dengan status dan metadata
+- **api_keys**: API keys dengan hash dan permissions
+- **used_amounts**: Tracking unique amounts untuk mencegah duplikasi
+- **transaction_logs**: Log transaksi untuk audit trail
+
+### Features:
+- Auto-initialization saat startup
+- Data cleanup untuk expired records
+- Proper indexing untuk performance
+- Graceful shutdown handling
 
 ## 🤝 Contributing
 
