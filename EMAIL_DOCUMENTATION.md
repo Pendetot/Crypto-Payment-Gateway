@@ -1,6 +1,6 @@
-# 📧 Email Notification System
+# 📧 Sistem Notifikasi Email
 
-## Overview
+## Gambaran Umum
 Sistem notifikasi email yang komprehensif untuk Crypto Payment Gateway yang mendukung notifikasi otomatis untuk berbagai status pembayaran.
 
 ## 🌟 Fitur Utama
@@ -30,7 +30,7 @@ Sistem notifikasi email yang komprehensif untuk Crypto Payment Gateway yang mend
 
 ### Konfigurasi Environment
 
-#### Mode Production
+#### Mode Produksi
 ```bash
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -46,15 +46,15 @@ ETHEREAL_USER=test@ethereal.email
 ETHEREAL_PASS=test-password
 ```
 
-### API Endpoints
+### Endpoint API
 
-#### 1. Status Email Service
+#### 1. Status Layanan Email
 ```bash
 GET /api/email/status
 Headers: X-API-Key: your-api-key
 ```
 
-#### 2. Test Email
+#### 2. Uji Coba Email
 ```bash
 POST /api/email/test
 Headers: 
@@ -128,108 +128,108 @@ Body:
 ## 🎨 Template Email
 
 ### Fitur Template
-- **Responsive Design**: Kompatibel dengan semua email client
-- **Professional Layout**: Design modern dan clean
-- **Brand Consistency**: Konsisten dengan identitas brand
-- **Sandbox Indicators**: Visual indicator untuk mode testing
-- **Multi-language Support**: Siap untuk internationalization
+- **Desain Responsif**: Kompatibel dengan semua klien email
+- **Tata Letak Profesional**: Desain modern dan bersih
+- **Konsistensi Merek**: Konsisten dengan identitas merek
+- **Indikator Sandbox**: Indikator visual untuk mode pengujian
+- **Dukungan Multi-bahasa**: Siap untuk internasionalisasi
 
 ### Struktur Template
 - Header dengan logo dan judul
 - Konten utama dengan informasi pembayaran
-- Call-to-action buttons
+- Tombol call-to-action
 - Footer dengan informasi kontak
-- Responsive untuk mobile dan desktop
+- Responsif untuk mobile dan desktop
 
-## 🔧 Integrasi dengan Payment Flow
+## 🔧 Integrasi dengan Alur Pembayaran
 
-### Automatic Triggers
+### Pemicu Otomatis
 Email dapat dipicu otomatis pada event berikut:
-1. **Payment Created**: Saat pembayaran baru dibuat
-2. **Payment Verified**: Saat pembayaran berhasil diverifikasi
-3. **Payment Expired**: Saat pembayaran melewati batas waktu
+1. **Pembayaran Dibuat**: Saat pembayaran baru dibuat
+2. **Pembayaran Terverifikasi**: Saat pembayaran berhasil diverifikasi
+3. **Pembayaran Kedaluwarsa**: Saat pembayaran melewati batas waktu
 
-### Manual Triggers
+### Pemicu Manual
 Email juga dapat dipicu manual melalui API untuk:
-- Testing dan debugging
-- Resend notifications
-- Custom scenarios
+- Pengujian dan debugging
+- Mengirim ulang notifikasi
+- Skenario khusus
 
-## 🛡️ Security & Privacy
+## 🛡️ Keamanan & Privasi
 
-### Data Protection
-- Email addresses tidak disimpan permanen
+### Perlindungan Data
+- Alamat email tidak disimpan permanen
 - Enkripsi data sensitif dalam transit
-- Rate limiting untuk mencegah spam
+- Pembatasan rate untuk mencegah spam
 - Validasi input yang ketat
 
-### Authentication
-- API key required untuk semua endpoints
-- Permission-based access control
-- Audit logging untuk tracking
+### Autentikasi
+- API key diperlukan untuk semua endpoint
+- Kontrol akses berbasis izin
+- Audit logging untuk pelacakan
 
-## 📊 Monitoring & Analytics
+## 📊 Pemantauan & Analitik
 
 ### Logging
-- Email delivery status
-- Error tracking dan debugging
-- Performance metrics
-- User engagement tracking
+- Status pengiriman email
+- Pelacakan error dan debugging
+- Metrik performa
+- Pelacakan keterlibatan pengguna
 
-### Error Handling
-- Graceful fallback untuk SMTP failures
-- Retry mechanism untuk failed deliveries
-- Detailed error reporting
-- Health check endpoints
+### Penanganan Error
+- Fallback yang elegan untuk kegagalan SMTP
+- Mekanisme retry untuk pengiriman yang gagal
+- Pelaporan error yang detail
+- Endpoint health check
 
 ## 🚀 Deployment
 
-### Production Setup
-1. Configure SMTP credentials
-2. Set up proper DNS records (SPF, DKIM)
-3. Configure rate limiting
-4. Set up monitoring and alerts
+### Pengaturan Produksi
+1. Konfigurasi kredensial SMTP
+2. Atur record DNS yang tepat (SPF, DKIM)
+3. Konfigurasi pembatasan rate
+4. Atur pemantauan dan alert
 
-### Testing Setup
-1. Use Ethereal Email for development
-2. Test all email templates
-3. Verify responsive design
-4. Test error scenarios
+### Pengaturan Pengujian
+1. Gunakan Ethereal Email untuk development
+2. Uji semua template email
+3. Verifikasi desain responsif
+4. Uji skenario error
 
-## 📈 Future Enhancements
+## 📈 Peningkatan di Masa Depan
 
-### Planned Features
-- Email template customization
-- Multi-language support
-- Advanced analytics dashboard
-- Webhook integration
-- Bulk email capabilities
-- A/B testing for templates
+### Fitur yang Direncanakan
+- Kustomisasi template email
+- Dukungan multi-bahasa
+- Dashboard analitik lanjutan
+- Integrasi webhook
+- Kemampuan email massal
+- A/B testing untuk template
 
-### Integration Opportunities
-- CRM system integration
-- Marketing automation
-- Customer support ticketing
-- Analytics platforms
-- Mobile push notifications
+### Peluang Integrasi
+- Integrasi sistem CRM
+- Otomatisasi pemasaran
+- Sistem tiket dukungan pelanggan
+- Platform analitik
+- Notifikasi push mobile
 
-## 🆘 Troubleshooting
+## 🆘 Pemecahan Masalah
 
-### Common Issues
-1. **SMTP Authentication Failed**
-   - Verify credentials
-   - Check app password settings
-   - Ensure 2FA is configured
+### Masalah Umum
+1. **Autentikasi SMTP Gagal**
+   - Verifikasi kredensial
+   - Periksa pengaturan app password
+   - Pastikan 2FA dikonfigurasi
 
-2. **Emails Not Delivered**
-   - Check spam folders
-   - Verify DNS records
-   - Monitor delivery logs
+2. **Email Tidak Terkirim**
+   - Periksa folder spam
+   - Verifikasi record DNS
+   - Pantau log pengiriman
 
-3. **Template Rendering Issues**
-   - Test with different email clients
-   - Validate HTML structure
-   - Check CSS compatibility
+3. **Masalah Rendering Template**
+   - Uji dengan klien email yang berbeda
+   - Validasi struktur HTML
+   - Periksa kompatibilitas CSS
 
-### Support
+### Dukungan
 Untuk bantuan teknis, hubungi tim development atau buat issue di repository GitHub.

@@ -12,6 +12,13 @@ Payment gateway untuk menerima pembayaran crypto menggunakan USDT di jaringan Bi
 - ✅ Sistem API Key management
 - ✅ Clean architecture dan error handling
 
+## 📚 Dokumentasi
+
+Untuk informasi lebih detail, silakan baca dokumentasi berikut:
+
+- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan
+- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email
+
 ## Struktur Project
 
 ```
@@ -31,7 +38,9 @@ crypto-payment-gateway/
 │   └── app.js              # Main application
 ├── .env.example            # Environment template
 ├── package.json
-└── README.md
+├── README.md               # Dokumentasi utama
+├── SANDBOX.md              # Dokumentasi mode sandbox
+└── EMAIL_DOCUMENTATION.md  # Dokumentasi sistem email
 ```
 
 ## Installation
@@ -59,6 +68,20 @@ cp .env.example .env
 npm run dev  # Development
 npm start    # Production
 ```
+
+## 📚 Dokumentasi
+
+Proyek ini menyertakan dokumentasi lengkap untuk berbagai fitur:
+
+- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan yang aman
+- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email komprehensif
+
+### Dokumentasi API
+Akses dokumentasi API interaktif di:
+```
+http://localhost:3000/api/docs
+```
+Menampilkan dokumentasi API lengkap dengan semua endpoints dan permissions.
 
 ## Environment Configuration
 
