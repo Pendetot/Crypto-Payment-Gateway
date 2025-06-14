@@ -69,20 +69,6 @@ npm run dev  # Development
 npm start    # Production
 ```
 
-## 📚 Dokumentasi
-
-Proyek ini menyertakan dokumentasi lengkap untuk berbagai fitur:
-
-- **[SANDBOX.md](./SANDBOX.md)** - Panduan lengkap mode sandbox untuk pengujian dan pengembangan yang aman
-- **[EMAIL_DOCUMENTATION.md](./EMAIL_DOCUMENTATION.md)** - Dokumentasi sistem notifikasi email komprehensif
-
-### Dokumentasi API
-Akses dokumentasi API interaktif di:
-```
-http://localhost:3000/api/docs
-```
-Menampilkan dokumentasi API lengkap dengan semua endpoints dan permissions.
-
 ## Environment Configuration
 
 ### Cara Mendapatkan Data Environment
