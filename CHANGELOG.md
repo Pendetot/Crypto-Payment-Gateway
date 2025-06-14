@@ -7,86 +7,120 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - 2024-06-14
+## [1.2.0] - 2024-12-19
 
 ### Added
-- Comprehensive project structure documentation in README.md
-- Detailed file and directory descriptions for better code navigation
-- Enhanced documentation for all service files and their purposes
+- **PHP Integration Examples**: Comprehensive PHP example folder with complete integration examples
+  - `config.php`: Configuration file with API settings, database config, and helper functions
+  - `create_payment.php`: Example for creating new payments with metadata support
+  - `check_status.php`: Payment status checking with CLI interface
+  - `webhook_handler.php`: Webhook handler with signature verification and event handling
+  - `complete_example.php`: Full e-commerce integration example with order management
+- **Email Notification System**: Complete email notification system for payment events
+  - Email service with configurable SMTP settings
+  - Support for payment confirmation, expiration, and failure notifications
+  - Template-based email system with customizable content
+  - Email route endpoints for testing and configuration
+- **Comprehensive Sandbox Mode**: Safe testing environment for development
+  - Sandbox payment service with simulated blockchain interactions
+  - Separate sandbox endpoints and configuration
+  - Mock transaction generation for testing
+  - Sandbox-specific documentation and usage examples
+- **Enhanced Documentation**: 
+  - Indonesian translation for EMAIL_DOCUMENTATION.md
+  - Indonesian translation for SANDBOX.md
+  - Detailed PHP integration examples with security best practices
+  - Comprehensive troubleshooting guides
 
 ### Changed
-- **BREAKING**: Updated project structure section in README.md to reflect actual repository structure
-- Moved app.js documentation from src/ to root level (matches actual file location)
-- Enhanced descriptions for middleware, routes, services, and validators
-- Improved clarity of file organization and architecture
+- **Project Structure**: Updated README.md to reflect actual repository structure
+- **Documentation Cleanup**: Removed merge conflicts and improved formatting in README.md
+- **Server Configuration**: Configured server to run on host 0.0.0.0 for public access
+
+### Removed
+- **Cleanup**: Removed unnecessary files and directories
+  - Deleted node_modules directory from repository
+  - Removed sandbox.log file
+  - Added .gitignore to exclude log files
 
 ### Fixed
-- Corrected inaccurate file paths in project structure documentation
-- Fixed missing files in documentation (LICENSE, package-lock.json)
-- Aligned documentation with actual codebase structure
+- **Documentation**: Fixed duplicate documentation sections in README.md
+- **Merge Conflicts**: Resolved merge conflicts and cleaned up documentation
 
-### Documentation
-- Added missing route files documentation (email.js, sandbox.js)
-- Enhanced service file descriptions (emailService.js, paymentServiceFactory.js, sandboxPaymentService.js)
-- Improved middleware and validator documentation
-- Updated example directory structure documentation
+### Security
+- **API Key Management**: Enhanced API key security and management
+- **Webhook Security**: Implemented webhook signature verification
+- **Input Validation**: Comprehensive input validation for all endpoints
 
-## [1.1.0] - Previous Release
+## [1.1.0] - 2024-12-15
 
 ### Added
-- Email notification system with comprehensive documentation
-- Sandbox mode for testing and development
-- API key management system
-- Webhook handling for payment notifications
-- Rate limiting and security features
-- Clean architecture implementation
+- **Core Payment System**: Initial implementation of crypto payment gateway
+  - USDT BSC-20 payment processing
+  - Trust Wallet integration with QR code generation
+  - Automatic transaction verification
+  - Webhook system for payment notifications
+- **API Infrastructure**:
+  - RESTful API with Express.js
+  - Rate limiting and security middleware
+  - API key authentication system
+  - Error handling and logging
+- **Payment Features**:
+  - Payment creation and status tracking
+  - QR code generation for mobile wallets
+  - Real-time payment verification
+  - Webhook notifications for payment events
+- **Security Features**:
+  - Helmet.js for security headers
+  - CORS configuration
+  - Rate limiting protection
+  - Input validation with Joi
 
-### Features
-- ✅ USDT payments on BSC-20 network
-- ✅ QR Code generation for Trust Wallet integration
-- ✅ Automatic transaction verification
-- ✅ Webhook notifications for payment events
-- ✅ API rate limiting and security
-- ✅ API Key management system
-- ✅ Clean architecture and error handling
+### Technical Details
+- **Dependencies**: 
+  - Express.js for web framework
+  - Web3.js for blockchain interaction
+  - QRCode library for QR generation
+  - Nodemailer for email notifications
+  - Joi for input validation
+  - Morgan for request logging
+- **Architecture**: Clean architecture with separated concerns
+  - Middleware layer for authentication and error handling
+  - Service layer for business logic
+  - Route layer for API endpoints
+  - Validator layer for input validation
 
-### Documentation
-- Complete setup and installation guide
-- Environment configuration documentation
-- API endpoint documentation
-- PHP integration examples
-- Troubleshooting guide
-
-## [1.0.0] - Initial Release
+## [1.0.0] - 2024-12-14
 
 ### Added
-- Core crypto payment gateway functionality
-- BSC USDT payment processing
-- Trust Wallet integration
-- Basic API endpoints
-- Payment verification system
-- Initial documentation
+- **Initial Release**: Basic project structure and core files
+  - Project initialization with package.json
+  - Basic README.md documentation
+  - MIT License
+  - Core application entry point (app.js)
 
 ---
 
-## Types of Changes
-- **Added** for new features
-- **Changed** for changes in existing functionality
-- **Deprecated** for soon-to-be removed features
-- **Removed** for now removed features
-- **Fixed** for any bug fixes
-- **Security** for vulnerability fixes
-- **Documentation** for documentation changes
+## Development Notes
 
-## Migration Guide
+### Recent Development Focus (December 2024)
+- **Integration Examples**: Major focus on providing comprehensive PHP integration examples
+- **Documentation**: Extensive documentation improvements with Indonesian translations
+- **Testing Infrastructure**: Sandbox mode implementation for safe development and testing
+- **Email System**: Complete email notification system for better user experience
+- **Security Enhancements**: Improved security measures and best practices
 
-### From v1.1.0 to v1.2.0
-No breaking changes in functionality. Only documentation updates:
-- Review updated project structure in README.md
-- File locations remain the same, only documentation was corrected
+### Upcoming Features
+- Enhanced monitoring and analytics
+- Additional payment method support
+- Mobile SDK development
+- Advanced webhook retry mechanisms
+- Performance optimizations
 
-### Future Releases
-- Database integration (MongoDB/Redis)
-- Enhanced security features
-- Multi-currency support
-- Advanced webhook features
+### Contributors
+- **LazyDev**: Project maintenance and documentation updates
+- **Robocoders**: Feature development and system enhancements
+
+---
+
+*For more detailed information about specific features, please refer to the respective documentation files in the repository.*
