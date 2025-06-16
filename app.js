@@ -83,9 +83,9 @@ app.get('/api/docs', (req, res) => {
   res.json({
     success: true,
     data: {
-      title: 'USDT Payment Gateway API',
-      version: '1.0.0',
-      description: 'API for processing USDT payments on Binance Smart Chain',
+      title: 'Multi-Network Crypto Payment Gateway API',
+      version: '2.0.0',
+      description: 'API for processing cryptocurrency payments on multiple networks (BSC, Ethereum, Solana)',
       authentication: {
         type: 'API Key',
         header: 'X-API-Key',
@@ -99,6 +99,8 @@ app.get('/api/docs', (req, res) => {
             body: {
               amount: 'number (required)',
               orderId: 'string (required)',
+              network: 'string (optional, default: BSC) - BSC, ETH, SOL',
+              token: 'string (optional, default: USDT) - Token symbol',
               metadata: 'object (optional)'
             }
           },
@@ -107,7 +109,8 @@ app.get('/api/docs', (req, res) => {
             permission: 'payment:verify',
             body: {
               paymentId: 'string (required)',
-              txHash: 'string (required)'
+              txHash: 'string (required)',
+              network: 'string (optional) - Network for validation'
             }
           },
           'GET /api/payment/status/:paymentId': {
@@ -120,7 +123,17 @@ app.get('/api/docs', (req, res) => {
           },
           'GET /api/payment/list': {
             description: 'List payments (Admin only)',
-            permission: 'admin'
+            permission: 'admin',
+            query: {
+              status: 'string (optional) - Filter by status',
+              network: 'string (optional) - Filter by network',
+              limit: 'number (optional, default: 50)',
+              offset: 'number (optional, default: 0)'
+            }
+          },
+          'GET /api/payment/networks': {
+            description: 'Get supported networks and tokens',
+            permission: 'payment:status'
           }
         },
         apiKeys: {
