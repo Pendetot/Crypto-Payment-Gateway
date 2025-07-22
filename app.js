@@ -5,6 +5,55 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
+// Validate critical environment variables
+function validateEnvironment() {
+  const requiredVars = [
+    'BSC_RPC_URL',
+    'USDT_CONTRACT_ADDRESS', 
+    'WALLET_ADDRESS',
+    'PAYMENT_TIMEOUT',
+    'MIN_CONFIRMATIONS'
+  ];
+
+  const missing = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missing.length > 0) {
+    console.error('❌ Missing required environment variables:');
+    missing.forEach(varName => {
+      console.error(`   - ${varName}`);
+    });
+    console.error('\n📝 Please check your .env file and ensure all required variables are set.');
+    process.exit(1);
+  }
+
+  // Validate numeric environment variables
+  const numericVars = ['PAYMENT_TIMEOUT', 'MIN_CONFIRMATIONS'];
+  numericVars.forEach(varName => {
+    const value = parseInt(process.env[varName]);
+    if (isNaN(value) || value <= 0) {
+      console.error(`❌ Invalid numeric value for ${varName}: ${process.env[varName]}`);
+      process.exit(1);
+    }
+  });
+
+  // Validate wallet address format
+  if (!/^0x[a-fA-F0-9]{40}$/.test(process.env.WALLET_ADDRESS)) {
+    console.error(`❌ Invalid wallet address format: ${process.env.WALLET_ADDRESS}`);
+    process.exit(1);
+  }
+
+  // Validate contract address format
+  if (!/^0x[a-fA-F0-9]{40}$/.test(process.env.USDT_CONTRACT_ADDRESS)) {
+    console.error(`❌ Invalid USDT contract address format: ${process.env.USDT_CONTRACT_ADDRESS}`);
+    process.exit(1);
+  }
+
+  console.log('✅ Environment variables validated successfully');
+}
+
+// Validate environment before proceeding
+validateEnvironment();
+
 const paymentRoutes = require('./src/routes/payment');
 const webhookRoutes = require('./src/routes/webhook');
 const apiKeyRoutes = require('./src/routes/apiKeys');

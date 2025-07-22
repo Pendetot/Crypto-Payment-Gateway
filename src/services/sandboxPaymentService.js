@@ -17,16 +17,30 @@ class SandboxPaymentService {
     let attempts = 0;
     let uniqueAmount;
     
+    // Convert to number with proper validation
+    const baseAmount = typeof originalAmount === 'string' ? parseFloat(originalAmount) : originalAmount;
+    if (isNaN(baseAmount) || baseAmount <= 0) {
+      throw new Error('Invalid base amount');
+    }
+    
     do {
       const randomCents = Math.floor(Math.random() * 99) + 1;
       const centsDecimal = randomCents / 100;
       
-      uniqueAmount = parseFloat((originalAmount + centsDecimal).toFixed(2));
+      // Use precise decimal arithmetic
+      const aDecimal = (baseAmount.toString().split('.')[1] || '').length;
+      const bDecimal = (centsDecimal.toString().split('.')[1] || '').length;
+      const multiplier = Math.pow(10, Math.max(aDecimal, bDecimal));
+      uniqueAmount = Math.round((Math.round(baseAmount * multiplier) + Math.round(centsDecimal * multiplier)) / multiplier * 100) / 100;
+      
       attempts++;
       
       if (attempts > 50) {
         const timestamp = Date.now() % 100;
-        uniqueAmount = parseFloat((originalAmount + (timestamp / 100)).toFixed(2));
+        const timestampDecimal = timestamp / 100;
+        const tDecimal = (timestampDecimal.toString().split('.')[1] || '').length;
+        const tMultiplier = Math.pow(10, Math.max(aDecimal, tDecimal));
+        uniqueAmount = Math.round((Math.round(baseAmount * tMultiplier) + Math.round(timestampDecimal * tMultiplier)) / tMultiplier * 100) / 100;
         break;
       }
     } while (this.usedUniqueAmounts.has(uniqueAmount));
@@ -45,11 +59,17 @@ class SandboxPaymentService {
     const paymentId = uuidv4();
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes in sandbox
     
-    const uniqueAmount = this.generateUniqueAmount(parseFloat(amount));
+    // Validate and convert amount
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      throw new Error('Invalid payment amount');
+    }
+    
+    const uniqueAmount = this.generateUniqueAmount(numericAmount);
     
     const paymentData = {
       id: paymentId,
-      originalAmount: amount.toString(),
+              originalAmount: numericAmount.toString(),
       amount: uniqueAmount.toString(),
       orderId,
       walletAddress: this.sandboxWallet,
@@ -173,20 +193,46 @@ class SandboxPaymentService {
   }
 
   validateMockTransaction(transaction, payment) {
-    // Simulate transaction validation logic
-    const expectedAmount = Math.floor(parseFloat(payment.amount) * 1000000); // Convert to wei equivalent
-    const txAmount = parseInt(transaction.input.slice(-64), 16);
+    // Simulate transaction validation logic with proper bounds checking
+    const paymentAmount = typeof payment.amount === 'string' ? parseFloat(payment.amount) : payment.amount;
+    if (isNaN(paymentAmount) || paymentAmount <= 0) {
+      return false;
+    }
+    
+    const expectedAmount = Math.floor(paymentAmount * 1000000); // Convert to wei equivalent
+    
+    // Safe parsing with bounds checking to prevent overflow
+    const inputSlice = transaction.input.slice(-64);
+    if (!/^[0-9a-fA-F]+$/.test(inputSlice)) {
+      return false;
+    }
+    
+    let txAmount;
+    try {
+      txAmount = parseInt(inputSlice, 16);
+      // Check for valid range (prevent overflow)
+      if (txAmount < 0 || txAmount > Number.MAX_SAFE_INTEGER) {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
     
     return Math.abs(txAmount - expectedAmount) < 1000; // Allow small variance in sandbox
   }
 
   findPaymentByAmount(amount) {
-    const numAmount = parseFloat(amount);
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return null;
+    }
     
     for (const [paymentId, payment] of this.pendingPayments) {
-      if (payment.status === 'pending' && 
-          parseFloat(payment.amount) === numAmount) {
-        return { paymentId, payment };
+      if (payment.status === 'pending') {
+        const paymentAmount = typeof payment.amount === 'string' ? parseFloat(payment.amount) : payment.amount;
+        if (!isNaN(paymentAmount) && Math.abs(paymentAmount - numAmount) < 0.001) { // Use small epsilon for comparison
+          return { paymentId, payment };
+        }
       }
     }
     return null;
@@ -208,7 +254,10 @@ class SandboxPaymentService {
       payment.metadata.expiredInSandbox = true;
       this.pendingPayments.set(paymentId, payment);
       
-      this.usedUniqueAmounts.delete(parseFloat(payment.amount));
+      const numericAmount = typeof payment.amount === 'string' ? parseFloat(payment.amount) : payment.amount;
+      if (!isNaN(numericAmount) && numericAmount > 0) {
+        this.usedUniqueAmounts.delete(numericAmount);
+      }
     }
   }
 

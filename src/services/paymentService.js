@@ -4,27 +4,57 @@ const { v4: uuidv4 } = require('uuid');
 const { validatePaymentRequest } = require('../validators/paymentValidator');
 const databaseService = require('./databaseService');
 
+// Utility for precise decimal calculations
+class DecimalUtils {
+  static multiply(a, b) {
+    const aDecimal = (a.toString().split('.')[1] || '').length;
+    const bDecimal = (b.toString().split('.')[1] || '').length;
+    const multiplier = Math.pow(10, Math.max(aDecimal, bDecimal));
+    return Math.round(a * multiplier) * Math.round(b * multiplier) / (multiplier * multiplier);
+  }
+  
+  static add(a, b) {
+    const aDecimal = (a.toString().split('.')[1] || '').length;
+    const bDecimal = (b.toString().split('.')[1] || '').length;
+    const multiplier = Math.pow(10, Math.max(aDecimal, bDecimal));
+    return (Math.round(a * multiplier) + Math.round(b * multiplier)) / multiplier;
+  }
+  
+  static toFixed(value, decimals = 2) {
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(value * multiplier) / multiplier;
+  }
+}
+
 class PaymentService {
   constructor() {
     this.web3 = new Web3(process.env.BSC_RPC_URL);
     this.usdtContract = process.env.USDT_CONTRACT_ADDRESS;
     this.walletAddress = process.env.WALLET_ADDRESS;
+    this.paymentTimeouts = new Map(); // Track payment timeouts for cleanup
   }
 
   async generateUniqueAmount(originalAmount) {
     let attempts = 0;
     let uniqueAmount;
     
+    // Convert to number with proper validation
+    const baseAmount = typeof originalAmount === 'string' ? parseFloat(originalAmount) : originalAmount;
+    if (isNaN(baseAmount) || baseAmount <= 0) {
+      throw new Error('Invalid base amount');
+    }
+    
     do {
       const randomCents = Math.floor(Math.random() * 99) + 1;
       const centsDecimal = randomCents / 100;
       
-      uniqueAmount = parseFloat((originalAmount + centsDecimal).toFixed(2));
+      // Use precise decimal arithmetic
+      uniqueAmount = DecimalUtils.toFixed(DecimalUtils.add(baseAmount, centsDecimal), 2);
       attempts++;
       
       if (attempts > 50) {
         const timestamp = Date.now() % 100;
-        uniqueAmount = parseFloat((originalAmount + (timestamp / 100)).toFixed(2));
+        uniqueAmount = DecimalUtils.toFixed(DecimalUtils.add(baseAmount, timestamp / 100), 2);
         break;
       }
     } while (await databaseService.isAmountUsed(uniqueAmount));
@@ -38,13 +68,20 @@ class PaymentService {
 
   async createPayment(amount, orderId, metadata = {}) {
     const paymentId = uuidv4();
-    const expiresAt = new Date(Date.now() + (process.env.PAYMENT_TIMEOUT * 1000));
+    const timeoutMs = parseInt(process.env.PAYMENT_TIMEOUT) * 1000;
+    const expiresAt = new Date(Date.now() + timeoutMs);
     
-    const uniqueAmount = await this.generateUniqueAmount(parseFloat(amount));
+    // Validate and convert amount
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      throw new Error('Invalid payment amount');
+    }
+    
+    const uniqueAmount = await this.generateUniqueAmount(numericAmount);
     
     const paymentData = {
       id: paymentId,
-      originalAmount: amount.toString(), 
+      originalAmount: numericAmount.toString(), 
       amount: uniqueAmount.toString(), 
       orderId,
       walletAddress: this.walletAddress,
@@ -66,10 +103,13 @@ class PaymentService {
     // Save to database
     await databaseService.createPayment(paymentData);
     
-    // Set expiration timer
-    setTimeout(() => {
-      this.expirePayment(paymentId);
-    }, process.env.PAYMENT_TIMEOUT * 1000);
+    // Set expiration timer with cleanup
+    const timeoutId = setTimeout(async () => {
+      await this.expirePayment(paymentId);
+      this.paymentTimeouts.delete(paymentId);
+    }, timeoutMs);
+    
+    this.paymentTimeouts.set(paymentId, timeoutId);
 
     return paymentData;
   }
@@ -129,15 +169,22 @@ class PaymentService {
       }
 
       const confirmations = await this.getConfirmations(txHash);
+      const minConfirmations = parseInt(process.env.MIN_CONFIRMATIONS);
       
       const updates = {
         tx_hash: txHash,
         confirmations: confirmations,
-        status: confirmations >= process.env.MIN_CONFIRMATIONS ? 'confirmed' : 'pending_confirmation',
+        status: confirmations >= minConfirmations ? 'confirmed' : 'pending_confirmation',
         verified_at: new Date().toISOString()
       };
 
       await databaseService.updatePayment(paymentId, updates);
+      
+      // Clear timeout if payment is verified
+      if (this.paymentTimeouts.has(paymentId)) {
+        clearTimeout(this.paymentTimeouts.get(paymentId));
+        this.paymentTimeouts.delete(paymentId);
+      }
       
       // Log transaction
       await databaseService.logTransaction({
@@ -178,7 +225,12 @@ class PaymentService {
   }
 
   async findPaymentByAmount(amount) {
-    const payment = await databaseService.findPaymentByAmount(parseFloat(amount));
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return null;
+    }
+    
+    const payment = await databaseService.findPaymentByAmount(numericAmount);
     if (payment) {
       return { paymentId: payment.id, payment };
     }
@@ -211,7 +263,15 @@ class PaymentService {
       });
       
       // Remove from used amounts
-      await databaseService.removeUsedAmount(parseFloat(payment.amount));
+      const numericAmount = typeof payment.amount === 'string' ? parseFloat(payment.amount) : payment.amount;
+      if (!isNaN(numericAmount) && numericAmount > 0) {
+        await databaseService.removeUsedAmount(numericAmount);
+      }
+      
+      // Clean up timeout tracking
+      if (this.paymentTimeouts.has(paymentId)) {
+        this.paymentTimeouts.delete(paymentId);
+      }
     }
   }
 

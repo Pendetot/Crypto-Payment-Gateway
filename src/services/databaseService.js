@@ -149,6 +149,23 @@ class DatabaseService {
   }
 
   async updatePayment(paymentId, updates) {
+    // Validate column names to prevent SQL injection
+    const allowedColumns = [
+      'original_amount', 'amount', 'order_id', 'wallet_address', 
+      'contract_address', 'network', 'token', 'status', 'tx_hash', 
+      'confirmations', 'trust_wallet_url', 'qr_code', 'metadata', 
+      'expires_at', 'verified_at', 'confirmed_at'
+    ];
+    
+    const invalidColumns = Object.keys(updates).filter(key => !allowedColumns.includes(key));
+    if (invalidColumns.length > 0) {
+      throw new Error(`Invalid columns for update: ${invalidColumns.join(', ')}`);
+    }
+    
+    if (Object.keys(updates).length === 0) {
+      throw new Error('No valid columns to update');
+    }
+    
     const setClause = Object.keys(updates).map(key => `${key} = ?`).join(', ');
     const sql = `UPDATE payments SET ${setClause} WHERE id = ?`;
     const params = [...Object.values(updates), paymentId];

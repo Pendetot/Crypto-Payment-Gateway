@@ -1,6 +1,6 @@
 const express = require('express');
 const PaymentServiceFactory = require('../services/paymentServiceFactory');
-const { validatePaymentRequest, validateVerificationRequest } = require('../validators/paymentValidator');
+const { validatePaymentRequest, validateVerificationRequest, validatePagination } = require('../validators/paymentValidator');
 const { authenticateAPI, rateLimitByAPIKey } = require('../middleware/auth');
 
 const router = express.Router();
@@ -102,7 +102,7 @@ router.get('/status/:paymentId', authenticateAPI('payment:status'), async (req, 
   try {
     const { paymentId } = req.params;
     const paymentService = PaymentServiceFactory.getPaymentService();
-    const payment = paymentService.getPayment(paymentId);
+    const payment = await paymentService.getPayment(paymentId);
 
     if (!payment) {
       return res.status(404).json({
@@ -113,7 +113,7 @@ router.get('/status/:paymentId', authenticateAPI('payment:status'), async (req, 
 
     if (!req.apiKey.permissions.includes('admin')) {
       const paymentMetadata = payment.metadata || {};
-      const requestedBy = req.apiKey.key.substring(0, 8) + '...';
+      const requestedBy = req.apiKey.keyHash ? req.apiKey.keyHash.substring(0, 8) + '...' : 'unknown';
       
       if (paymentMetadata.requestedBy !== requestedBy) {
         return res.status(403).json({
@@ -187,21 +187,30 @@ router.get('/balance', authenticateAPI('payment:balance'), async (req, res) => {
 
 router.get('/list', authenticateAPI('admin'), async (req, res) => {
   try {
-    const { status, limit = 50, offset = 0 } = req.query;
+    // Validate pagination parameters
+    const { error, value } = validatePagination(req.query);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid pagination parameters',
+        details: error.details.map(detail => detail.message)
+      });
+    }
+    
+    const { status, limit, offset } = value;
     const paymentService = PaymentServiceFactory.getPaymentService();
     
-    const payments = Array.from(paymentService.pendingPayments.values())
-      .filter(payment => !status || payment.status === status)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(offset, offset + parseInt(limit));
-
-    const total = Array.from(paymentService.pendingPayments.values())
-      .filter(payment => !status || payment.status === status).length;
+    // Get all payments from database
+    const allPayments = await paymentService.getAllPayments(status);
+    
+    // Apply pagination (values are already validated and converted)
+    const total = allPayments.length;
+    const paginatedPayments = allPayments.slice(offset, offset + limit);
 
     res.json({
       success: true,
       data: {
-        payments: payments.map(payment => ({
+        payments: paginatedPayments.map(payment => ({
           paymentId: payment.id,
           status: payment.status,
           originalAmount: payment.originalAmount,
@@ -217,9 +226,9 @@ router.get('/list', authenticateAPI('admin'), async (req, res) => {
         })),
         pagination: {
           total,
-          limit: parseInt(limit),
-          offset: parseInt(offset),
-          hasMore: (offset + parseInt(limit)) < total
+          limit,
+          offset,
+          hasMore: (offset + limit) < total
         }
       }
     });
