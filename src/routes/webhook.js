@@ -4,19 +4,49 @@ const paymentService = require('../services/paymentService');
 
 const router = express.Router();
 
+// Deterministic JSON serialization for signature verification
+function createDeterministicSignature(data, secret) {
+  // Sort object keys recursively for deterministic serialization
+  function sortObjectKeys(obj) {
+    if (obj === null || typeof obj !== 'object' || obj instanceof Array) {
+      return obj;
+    }
+    
+    const sorted = {};
+    Object.keys(obj).sort().forEach(key => {
+      sorted[key] = sortObjectKeys(obj[key]);
+    });
+    return sorted;
+  }
+  
+  const sortedData = sortObjectKeys(data);
+  const body = JSON.stringify(sortedData);
+  
+  return crypto
+    .createHmac('sha256', secret)
+    .update(body)
+    .digest('hex');
+}
+
 function verifyWebhookSignature(req, res, next) {
   const signature = req.headers['x-webhook-signature'];
   if (!signature) {
     return res.status(401).json({ error: 'Missing webhook signature' });
   }
 
-  const body = JSON.stringify(req.body);
-  const expectedSignature = crypto
-    .createHmac('sha256', process.env.WEBHOOK_SECRET)
-    .update(body)
-    .digest('hex');
+  if (!process.env.WEBHOOK_SECRET) {
+    console.error('❌ WEBHOOK_SECRET environment variable not set');
+    return res.status(500).json({ error: 'Webhook configuration error' });
+  }
+
+  const expectedSignature = createDeterministicSignature(req.body, process.env.WEBHOOK_SECRET);
 
   if (signature !== expectedSignature) {
+    console.error('Webhook signature mismatch:', {
+      received: signature,
+      expected: expectedSignature,
+      body: req.body
+    });
     return res.status(401).json({ error: 'Invalid webhook signature' });
   }
 
@@ -27,18 +57,35 @@ router.post('/payment-confirmed', verifyWebhookSignature, async (req, res) => {
   try {
     const { paymentId, txHash, confirmations } = req.body;
     
-    const payment = paymentService.getPayment(paymentId);
+    // Validate input parameters
+    if (!paymentId || !txHash || typeof confirmations !== 'number') {
+      return res.status(400).json({ 
+        error: 'Missing or invalid parameters',
+        required: ['paymentId', 'txHash', 'confirmations']
+      });
+    }
+    
+    const payment = await paymentService.getPayment(paymentId);
     if (!payment) {
       return res.status(404).json({ error: 'Payment not found' });
     }
 
-    if (confirmations >= process.env.MIN_CONFIRMATIONS) {
-      payment.status = 'confirmed';
-      payment.confirmations = confirmations;
-      payment.confirmedAt = new Date();
+    const minConfirmations = parseInt(process.env.MIN_CONFIRMATIONS);
+    if (confirmations >= minConfirmations) {
+      const updates = {
+        status: 'confirmed',
+        confirmations: confirmations,
+        confirmed_at: new Date().toISOString()
+      };
+      
+      await require('../services/databaseService').updatePayment(paymentId, updates);
       
       console.log(`Payment ${paymentId} confirmed with ${confirmations} confirmations`);
       console.log(`Original amount: $${payment.originalAmount}, Paid: $${payment.amount}`);
+    } else {
+      await require('../services/databaseService').updatePayment(paymentId, {
+        confirmations: confirmations
+      });
     }
 
     res.json({ success: true });
@@ -52,12 +99,30 @@ router.post('/transaction-notification', verifyWebhookSignature, async (req, res
   try {
     const { txHash, toAddress, amount, token } = req.body;
     
+    // Validate input parameters
+    if (!txHash || !toAddress || !amount || !token) {
+      return res.status(400).json({ 
+        error: 'Missing required parameters',
+        required: ['txHash', 'toAddress', 'amount', 'token']
+      });
+    }
+    
+    // Validate transaction hash format
+    if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+      return res.status(400).json({ error: 'Invalid transaction hash format' });
+    }
+    
+    // Validate address formats
+    if (!/^0x[a-fA-F0-9]{40}$/.test(toAddress) || !/^0x[a-fA-F0-9]{40}$/.test(token)) {
+      return res.status(400).json({ error: 'Invalid address format' });
+    }
+    
     if (toAddress.toLowerCase() === process.env.WALLET_ADDRESS.toLowerCase() &&
         token.toLowerCase() === process.env.USDT_CONTRACT_ADDRESS.toLowerCase()) {
       
       console.log(`New USDT transaction received: ${txHash}, Amount: ${amount}`);
             
-      const paymentMatch = paymentService.findPaymentByAmount(amount);
+      const paymentMatch = await paymentService.findPaymentByAmount(amount);
       
       if (paymentMatch) {
         const { paymentId, payment } = paymentMatch;
@@ -71,13 +136,6 @@ router.post('/transaction-notification', verifyWebhookSignature, async (req, res
         }
       } else {
         console.log(`No matching pending payment found for amount: ${amount}`);
-        
-        console.log('Current pending payments:');
-        for (const [id, payment] of paymentService.pendingPayments) {
-          if (payment.status === 'pending') {
-            console.log(`- ID: ${id}, Amount: ${payment.amount}, Original: ${payment.originalAmount}`);
-          }
-        }
       }
     }
 
